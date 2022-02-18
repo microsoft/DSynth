@@ -1,0 +1,55 @@
+{
+  "staticExamples":
+  {
+    "stringValue": "sample static string",
+    "numberValue": 100,
+    "boolValue": true
+  },
+  "guidExamples": {
+    "guid": "{{Guid:NewGuid}}"
+  },
+  "macAddressExamples": {
+    "macAddress": "{{MacAddress:MacAddress}}"
+  },
+  "dateTimeExamples": 
+  {
+    "timestampUnixMs": "{{Timestamp:DateTime:UnixTimeInMs}}",
+    "timestampIso8601": "{{Timestamp:DateTime:UTCISO8601}}",
+    "timestampIso8601Tracked": "{{Timestamp:Tracked:UTCISO8601:iso8601TrackedKey}}",
+    "timestampIso8601Reference": "{{Timestamp:Reference:iso8601TrackedKey}}",
+    "timestampUnixMsTracked": "{{Timestamp:Tracked:UnixTimeInMs:unixMsTrackedKey}}",
+    "timestampUnixMsReference": "{{Timestamp:reference:unixMsTrackedKey}}",
+    "dateTimeRangeIso8601": "{{DateTime:Range:UTCISO8601:Years:1..5}}",
+    "dateTimeRangeUnixMs": "{{DateTime:Range:UnixTimeInMs:Years:1..5}}"
+  },
+  "jsonCollectionsExamples": 
+  {
+    "jsonCollection": "{{JsonCollection:Collection:Sample:sampleLocationNames}}",
+    "jsonCollectionTracked": "{{JsonCollection:Tracked:Sample:sampleLocationNames:jsonTrackedKey}}",
+    "jsonCollectionReference": "{{JsonCollection:Reference:jsonTrackedKey}}"
+  },
+  "csvCollectionsExamples":
+  {
+    "csvCollection": "{{CsvCollection:Collection:Sample:Model}}",
+    "csvCollectionTracked": "{{CsvCollection:Tracked:Sample:Model:csvTrackedKey}}",
+    "csvCollectionReferenceSameFieldInRow": "{{CsvCollection:Reference:Model:csvTrackedKey}}",
+    "csvCollectionReferenceAnotherFieldInRow": "{{CsvCollection:Reference:Color:csvTrackedKey}}",
+    "csvCollectionTrackedLimit": "{{CsvCollection:TrackedLimit:25:Sample:Model:csvTrackedLimitKey}}"
+  },
+  "numberExamples":
+  {
+    "numberWithNoPrecision": "{{Number:Range:0..100:0}}",
+    "numberWithFivePrecision": "{{Number:Range:0..100:5}}",
+    "numberIncrementTracked": "{{Number:IncrementTracked:1.0..20.0:0.1..0.3:100:numberIncTrackedKey}}",
+    "numberIncrementReference": "{{Number:Reference:numberIncTrackedKey}}",
+    "numberDecrementTracked": "{{Number:DecrementTracked:20..1:1..3:100:numberDecTrackedKey}}",
+    "numberDecrementReference": "{{Number:Reference:numberDecTrackedKey}}"
+  },
+  "nestedJsonExamples":
+  {
+    "nestedArray": 
+    [
+      {{Nested:Json:JsonSampleNested.template.json:1..3}}
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "collections": {
+    "unitTestCollection": [
+      "Testing value 1",
+      "This is value 2",
+      "What if value 3"
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "nestedIdExample": "{{Guid:NewGuid}}",
+  "nestedTimestampExample": "{{Timestamp:DateTime:UTCISO8601}}",
+  "nestedCollectionExample": "{{JsonCollection:Collection:Sample:sampleLocationNames}}"
+}

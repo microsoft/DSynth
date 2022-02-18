@@ -1,33 +1,87 @@
-# Project
+# DSynth
+DSynth is a template driven data generator. DSynth accepts templates of various formats, generates templated data and outputs the generated data into a configured sink[s]. DSynth also exposes an endpoint for each configured provider to allow for services to pull generated data when push is not supported. DSynth is very flexible and can easily be extended to support other template formats and sinks. Comes complete with API which allows control of DSynth, including the importing and exporting of profiles. DSynth also comes with out of the box support with Application Insights which can be paired with Grafana to provide rich visual telemetry.
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+## Supported Sinks:
+```
+- Azure Blob
+- Azure Cosmos DB
+- Azure Event Hubs
+- Azure Log Analytics
+- Azure Service Bus
+- Console
+- File
+- Http
+- SocketServer
+```
 
-As the maintainer of this project, please make a few updates:
+## Supported Template Formats:
+```
+- CSV
+- Images
+  - Jpeg
+  - Bmp
+  - Tiff
+  - Gif
+  - Png
+- JSON
+- JSONL
+- RAW
+- XML
+```
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+# To Run
+The project is "mostly" setup to run out of the box and requires prerequisites to support the image generation feature of DSynth (for Mac and Linux). After starting DSynth, you will see payloads in the format of CSV, JSON, XML and RAW written to console. Images are turned off by default, but can easily be enabled by setting `"isPushEnabled": true,` in `sample-providers.json` for the `ImageTemplateSample` provider.
 
-## Contributing
+### Mac Prerequisites:
+```
+brew install mono-libgdiplus
+```
+### Ubuntu Prerequisites:
+```
+sudo apt-get install libgdiplus
+```
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+### Build and Run DSynth
+```
+-- Run the following command appropriate for your environment --
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+(OSX)
+cd DSynth
+dotnet publish ./src/DSynth/DSynth.csproj --configuration Release --runtime osx-x64 --output ./release/osx-x64
+cd release/osx-64
+./DSynth
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+(Linux)
+cd DSynth
+dotnet publish ./src/DSynth/DSynth.csproj --configuration Release --runtime linux-x64 --output ./release/linux-x64
+cd release/linux-64
+./DSynth
 
-## Trademarks
+(Windows)
+cd DSynth
+dotnet publish ./src/DSynth/DSynth.csproj --configuration Release --runtime win-x64 --output ./release/win-x64
+cd release/win-64
+./DSynth.exe
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.
+(Linux-ARM64)
+cd DSynth
+dotnet publish ./src/DSynth/DSynth.csproj --configuration Release --runtime linux-arm64 --output ./release/linux-arm64
+cd release/linux-arm64
+./DSynth
+```
+
+### Additional Startup Arguments
+|Switch|Description|
+|--|--|
+|--headless|Starts DSynth in headless mode without the API|
+
+
+# Documentation Sections
+The steps above will get DSynth running with default sample values. To explore further and create your own profiles and templates, please follow the links below.
+
+1. [Template Tokens](./docs/Template-Tokens.md)
+2. [Template Formats](./docs/Template-Formats.md)
+3. [Template Collections](./docs/Template-Collections.md)
+4. [Provider Configurations](./docs/Provider-Configuration.md)
+5. [Sink Configurations](./docs/Sinks)
+6. [API Endpoints](./docs/API-Endpoints.md)

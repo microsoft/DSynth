@@ -1,0 +1,29 @@
+This is a sample raw file with token replacement.
+At this current timestamp '{{Timestamp:DateTime:UTCISO8601}}' the following sample results were produced:
+    stringValue:                                sample static string
+    numberValue:                                100
+    boolValue:                                  true
+    guid:                                       {{Guid:NewGuid}}
+    macAddress:                                 {{MacAddress:MacAddress}}
+    timestampTimeUnixMs:                        {{Timestamp:DateTime:UnixTimeInMs}}
+    timestampTimeIso8601:                       {{Timestamp:DateTime:UTCISO8601}}
+    timestampTimeIso8601Tracked:                {{Timestamp:Tracked:UTCISO8601:iso8601TrackedKey}}
+    timestampTimeIso8601Reference:              {{Timestamp:Reference:iso8601TrackedKey}}
+    timestampTimeUnixMsTracked:                 {{Timestamp:Tracked:UnixTimeInMs:unixMsTrackedKey}}
+    timestampTimeUnixMsReference:               {{Timestamp:reference:unixMsTrackedKey}}
+    dateTimeRangeIso8601                        {{DateTime:Range:UTCISO8601:Years:1..5}}
+    dateTimeRangeUnixMs                         {{DateTime:Range:UnixTimeInMs:Years:1..5}}
+    jsonCollection:                             {{JsonCollection:Collection:Sample:sampleLocationNames}}
+    jsonCollectionTracked:                      {{JsonCollection:Tracked:Sample:sampleLocationNames:jsonTrackedKey}}
+    jsonCollectionReference:                    {{JsonCollection:Reference:jsonTrackedKey}}
+    csvCollection:                              {{CsvCollection:Collection:Sample:Model}}
+    csvCollectionTracked:                       {{CsvCollection:Tracked:Sample:Model:csvTrackedKey}}
+    csvCollectionReferenceSameFieldInRow:       {{CsvCollection:Reference:Model:csvTrackedKey}}
+    csvCollectionReferenceAnotherFieldInRow:    {{CsvCollection:Reference:Color:csvTrackedKey}}
+    csvCollectionTrackedLimit                   {{CsvCollection:TrackedLimit:25:Sample:Model:csvTrackedLimitKey}}
+    numberWithNoPrecision:                      {{Number:Range:0..100:0}}
+    numberWithFivePrecision:                    {{Number:Range:0..100:5}}
+    numberIncrementTracked:                     {{Number:IncrementTracked:1.0..20.0:0.1..0.3:100:numberIncTrackedKey}}
+    numberIncrementReference:                   {{Number:Reference:numberIncTrackedKey}}
+    numberDecrementTracked:                     {{Number:DecrementTracked:20..1:1..3:100:numberDecTrackedKey}}
+    numberDecrementReference:                   {{Number:Reference:numberDecTrackedKey}}

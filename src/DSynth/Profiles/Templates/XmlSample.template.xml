@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Template>
+    <StaticExamples>
+        <StringValue>sample static string</StringValue>
+        <NumberValue>100</NumberValue>
+        <BoolValue>true</BoolValue>
+    </StaticExamples>
+    <GuidExamples>
+        <Guid>{{Guid:NewGuid}}</Guid>
+    </GuidExamples>
+    <MacAddressExamples>
+        <MacAddress>{{MacAddress:MacAddress}}</MacAddress>
+    </MacAddressExamples>
+    <DateTimeExamples>
+        <TimestampUnixMs>{{Timestamp:DateTime:UnixTimeInMs}}</TimestampUnixMs>
+        <TimestampIso8601>{{Timestamp:DateTime:UTCISO8601}}</TimestampIso8601>
+        <TimestampIso8601Tracked>{{Timestamp:Tracked:UTCISO8601:iso8601TrackedKey}}</TimestampIso8601Tracked>
+        <TimestampIso8601Reference>{{Timestamp:Reference:iso8601TrackedKey}}</TimestampIso8601Reference>
+        <TimestampUnixMsTracked>{{Timestamp:Tracked:UnixTimeInMs:unixMsTrackedKey}}</TimestampUnixMsTracked>
+        <TimestampUnixMsReference>{{Timestamp:reference:unixMsTrackedKey}}</TimestampUnixMsReference>
+        <DateTimeRangeIso8601>{{DateTime:Range:UTCISO8601:Years:1..5}}</DateTimeRangeIso8601>
+        <DateTimeRangeUnixTimeMs>{{DateTime:Range:UnixTimeInMs:Years:1..5}}</DateTimeRangeUnixTimeMs>
+    </DateTimeExamples>
+    <JsonCollectionsExamples>
+        <JsonCollection>{{JsonCollection:Collection:Sample:sampleLocationNames}}</JsonCollection>
+        <JsonCollectionTracked>{{JsonCollection:Tracked:Sample:sampleLocationNames:jsonTrackedKey}}</JsonCollectionTracked>
+        <JsonCollectionReference>{{JsonCollection:Reference:jsonTrackedKey}}</JsonCollectionReference>
+    </JsonCollectionsExamples>
+    <CsvCollectionsExamples>
+        <CsvCollection>{{CsvCollection:Collection:Sample:Model}}</CsvCollection>
+        <CsvCollectionTracked>{{CsvCollection:Tracked:Sample:Model:csvTrackedKey}}</CsvCollectionTracked>
+        <CsvCollectionReferenceSameFieldInRow>{{CsvCollection:Reference:Model:csvTrackedKey}}</CsvCollectionReferenceSameFieldInRow>
+        <CsvCollectionReferenceAnotherFieldInRow>{{CsvCollection:Reference:Color:csvTrackedKey}}</CsvCollectionReferenceAnotherFieldInRow>
+        <CsvCollectionTrackedLimit>{{CsvCollection:TrackedLimit:25:Sample:Model:csvTrackedLimitKey}}</CsvCollectionTrackedLimit>
+    </CsvCollectionsExamples>
+    <DoubleExamples>
+        <NumberWithNoPrecision>{{Number:Range:0..100:0}}</NumberWithNoPrecision>
+        <NumberWithFivePrecision>{{Number:Range:0..100:5}}</NumberWithFivePrecision>
+        <NumberIncrementTracked>{{Number:IncrementTracked:1.0..20.0:0.1..0.3:100:numberIncTrackedKey}}</NumberIncrementTracked>
+        <NumberIncrementReference>{{Number:Reference:numberIncTrackedKey}}</NumberIncrementReference>
+        <NumberDecrementTracked>{{Number:DecrementTracked:20..1:1..3:100:numberDecTrackedKey}}</NumberDecrementTracked>
+        <NumberDecrementReference>{{Number:Reference:numberDecTrackedKey}}</NumberDecrementReference>
+    </DoubleExamples>
+</Template>

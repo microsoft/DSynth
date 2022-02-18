@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Template>
+    <Property1>
+        <Value>value1</Value>
+    </Property1>
+    <Property2>
+        <Value>value2</Value>
+    </Property2>
+</Template>

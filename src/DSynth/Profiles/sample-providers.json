@@ -1,0 +1,84 @@
+{
+  "providers": [
+    {
+      "isPushEnabled": true,
+      "type": "JSON",
+      "providerName": "JsonTemplateSample",
+      "sinks": [
+        {
+          "type": "Console",
+          "writeToConsole": true,
+          "writeToLog": false
+        }
+      ],
+      "intervalInMs": 10000,
+      "templateName": "JsonSample.template.json",
+      "minBatchSize": 1,
+      "maxBatchSize": 0
+    },
+    {
+      "isPushEnabled": true,
+      "type": "XML",
+      "providerName": "XmlTemplateSample",
+      "sinks": [
+        {
+          "type": "Console",
+          "writeToConsole": true,
+          "writeToLog": false
+        }
+      ],
+      "intervalInMs": 10000,
+      "templateName": "XmlSample.template.xml",
+      "minBatchSize": 1,
+      "maxBatchSize": 0
+    },
+    {
+      "isPushEnabled": true,
+      "type": "CSV",
+      "providerName": "CsvTemplateSample",
+      "sinks": [
+        {
+          "type": "Console",
+          "writeToConsole": true,
+          "writeToLog": false
+        }
+      ],
+      "intervalInMs": 10000,
+      "templateName": "CsvSample.template.csv",
+      "minBatchSize": 1,
+      "maxBatchSize": 0
+    },
+    {
+      "isPushEnabled": true,
+      "type": "Raw",
+      "providerName": "RawTemplateSample",
+      "sinks": [
+        {
+          "type": "Console",
+          "writeToConsole": true,
+          "writeToLog": false
+        }
+      ],
+      "intervalInMs": 10000,
+      "templateName": "RawSample.template.raw",
+      "minBatchSize": 1,
+      "maxBatchSize": 0
+    },
+    {
+      "isPushEnabled": false,
+      "type": "Image",
+      "providerName": "ImageTemplateSample",
+      "sinks": [
+        {
+          "type": "File",
+          "baseFolderPath": "./file-sink-output",
+          "subfolderPattern": "{year}_{month}_{day}",
+          "filenamePattern": "image-{year}_{month}_{day}_{hour}_{minute}_{second}_{millisecond}",
+          "filenameSuffix": "Value will get overridden for images"
+        }
+      ],
+      "intervalInMs": 10000,
+      "templateName": "ImageSample.template.image"
+    }
+  ]
+}

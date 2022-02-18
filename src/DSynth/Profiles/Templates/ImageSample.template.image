@@ -1,0 +1,8 @@
+{
+  "imageText": "{{JsonCollection:Collection:Sample:availableText}}",
+  "fontSize": {{Number:Range:70..200:0}},
+  "fontFamily": "{{JsonCollection:Collection:Sample:availableFontFamilies}}",
+  "foregroundColor": "{{JsonCollection:Collection:Sample:availableColors}}",
+  "backgroundColor": "{{JsonCollection:Collection:Sample:availableColors}}",
+  "imageFormat": "{{JsonCollection:Collection:Sample:availableFormats}}"
+}

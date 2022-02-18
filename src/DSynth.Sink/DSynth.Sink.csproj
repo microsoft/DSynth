@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RuntimeIdentifiers>osx-x64;linux-x64;win-x64;linux-arm64</RuntimeIdentifiers>
+    <Version>12.0.0.1</Version>
+
+    <runtime>
+      <gcServer enabled="true" />
+    </runtime>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.5.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.4.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.19.0" />
+    <PackageReference Include="Microsoft.Azure.CosmosDB.BulkExecutor" Version="2.5.1-preview" />
+    <PackageReference Include="Microsoft.Azure.EventHubs" Version="4.3.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="NewtonSoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DSynth.Common\DSynth.Common.csproj" />
+    <ProjectReference Include="..\DSynth.Reporter\DSynth.Reporter.csproj" />
+  </ItemGroup>
+
+</Project>

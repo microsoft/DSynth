@@ -1,0 +1,8 @@
+{
+  "imageText": "test text",
+  "fontSize": 100,
+  "fontFamily": "GenericSerif",
+  "foregroundColor": "Blue",
+  "backgroundColor": "Black",
+  "imageFormat": "jpeg"
+}
