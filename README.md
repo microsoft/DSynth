@@ -83,5 +83,5 @@ The steps above will get DSynth running with default sample values. To explore f
 2. [Template Formats](./docs/Template-Formats.md)
 3. [Template Collections](./docs/Template-Collections.md)
 4. [Provider Configurations](./docs/Provider-Configuration.md)
-5. [Sink Configurations](./docs/Sinks)
+5. [Sink Configurations](./docs/Sinks.md)
 6. [API Endpoints](./docs/API-Endpoints.md)
