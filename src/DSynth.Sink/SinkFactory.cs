@@ -63,6 +63,10 @@ namespace DSynth.Sink
                     default:
                         ConsoleOptions consoleSinkOptionsDef = ConsoleOptions.ParseAndValidateOptions<ConsoleOptions>(sinkOptions);
                         return new Sinks.Console(providerName, consoleSinkOptionsDef, logger, token);
+
+                    case SinkType.AzureCustomLogs:
+                        AzureCustomLogsOptions azureCustomLogsOptions = AzureCustomLogsOptions.ParseAndValidateOptions<AzureCustomLogsOptions>(sinkOptions);
+                        return new AzureCustomLogs(providerName, azureCustomLogsOptions, telemetryClient, logger, token);
                 }
             }
             catch (Exception ex)

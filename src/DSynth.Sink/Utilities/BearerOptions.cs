@@ -3,19 +3,15 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-namespace DSynth.Sink
+namespace DSynth.Sink.Utilities
 {
-    public enum SinkType
+    public class BearerOptions
     {
-        Console,
-        HTTP,
-        File,
-        AzureBlob,
-        SocketServer,
-        AzureEventHub,
-        AzureServiceBus,
-        AzureCosmosDb,
-        AzureLogAnalytics,
-        AzureCustomLogs
+        public string TenantId { get; set; }
+        public string AppId { get; set; }
+        public string AppSecret { get; set; }
+        public string Scope { get; set; }
+        public int ExpBufferSeconds { get; set; }
+        public string AzureManagemenrDns { get; set; }
     }
 }
