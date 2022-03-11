@@ -3,15 +3,16 @@ The following documentation will outline how to configure various sinks. DSynth 
 
 ---
 ## Quick Links
-[Azure Blob](#azureblob)
-[Azure Cosmos DB](#azurecosmosdb)
-[Azure Event Hub](#azureeventhub)
-[Azure Log Analytics](#azureloganalytics)
-[Azure Service Bus](#azureservicebus)
-[File](#file)
-[Console](#console)
-[Http](#http)
-[Socket Server](#socketserver)
+[Azure Blob](#azureblob)</br>
+[Azure Cosmos DB](#azurecosmosdb)</br>
+[Azure Custom Logs](#azurecustomlogs)</br>
+[Azure Event Hub](#azureeventhub)</br>
+[Azure Log Analytics](#azureloganalytics)</br>
+[Azure Service Bus](#azureservicebus)</br>
+[File](#file)</br>
+[Console](#console)</br>
+[Http](#http)</br>
+[Socket Server](#socketserver)</br>
 ---
 
 ## <a id="azureblob"></a>Azure Blob
@@ -48,7 +49,7 @@ Provides functionality to save payloads to Azure Blob Store. Accepts 2 types of 
 ---
 
 ## <a id="azurecosmosdb"></a>Azure Cosmos DB
-Provides functionality to save payloads to Azure Blob Store
+Provides functionality to save payloads to Azure Cosmos DB
 
 ### Structure
 ```json
@@ -68,7 +69,8 @@ Provides functionality to save payloads to Azure Blob Store
   }
 ]
 ```
-[Published Documentation](https://docs.microsoft.com/en-us/azure/cosmos-db/bulk-executor-dot-net)
+### Documentation
+[Use the bulk executor .NET library to perform bulk operations in Azure Cosmos DB](https://docs.microsoft.com/en-us/azure/cosmos-db/bulk-executor-dot-net)
 
 ### Parameters
 |Parameter Name|Available Values|Description|
@@ -87,6 +89,53 @@ Provides functionality to save payloads to Azure Blob Store
 
 ---
 
+## <a id="azurecustomlogs"></a>Azure Custom Logs
+Provides functionality to write payloads to Azure Custom Logs via Data Connection Endpoint (DCE) and Data Connection Rules (DCR). **Please note that this is still in preview - please be sure to read over the documentation first.**
+
+### Structure
+```json
+"sinks": [
+  {
+    "type": "AzureCustomLogs",
+    "tenantId": "00000000-0000-0000-0000-000000000000",
+    "appId": "00000000-0000-0000-0000-000000000000",
+    "appSecret": "MyAppSecret",
+    "dcrImmutableId": "dcr-00000000000000000000000000000000",
+    "dataCollectionEndpoint": "https://DCE.ingest.monitor.azure.com",
+    "customTableName": "MyCustomTableName_CL",
+    "enableCompression": true,
+    "bearerScope": "https://monitor.azure.com//.default",
+    "bearerExpBufferSeconds": 60,
+    "requestTimeoutMs": 60000,
+    "azureManagementDns": "login.microsoftonline.com",
+    "apiVersion": "2021-11-01-preview"
+  }
+]
+```
+### Documentation
+[Sending Custom Data (Preview)](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/tutorial-custom-logs#overview-of-tutorial)
+
+[Structure of a data collection rule in Azure Monitor (preview)](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/data-collection-rule-structure#custom-logs)
+
+### Parameters
+|Parameter Name|Available Values|Description|
+|--|--|--|
+|type|AzureCustomLogs|Specifies the sink type of AzureCustomLogs|
+|tenantId|Guid value as string|The tenant id of your application registration|
+|appId|Guid value as string|The app id that has permissions of [Monitoring Contributor](https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/data-collection-rule-overview#permissions)|
+|appSecret|String value|App secret for the appId. Supports retrieving secret from environment variable using `env:MY_ENV_VAR_NAME` as the appSecret value.|
+|dcrImmutableId|Non-Spaced string value|The id of the data collection rule|
+|dataCollectionEndpoint|Non-Spaced string value|The data collection endpoint where logs will be sent to|
+|customTableName|Non-Spaced string value|The name of the custom table to receive the custom logs, including the '_CL' suffix|
+|enableCompression (Optional)|bool value|Enables compressing the payload with GZip, **Default false**|
+|bearerScope (Optional)|Non-Spaced string value|The scope of the bearer token, **Default https://monitor.azure.com//.default**|
+|bearerExpBufferSeconds (Optional)|Int value|Allows getting a bearer token sooner than the expiration time to help avoid race conditions, **Default 60**|
+|requestTimeoutMs (Optional)|Int value|How long before the HttpClient waits before timing out. **Default 60000**|
+|azureManagementDns (Optional)|Non-Spaced string value|Specifies the DNS of the endpoint where the bearer token will be retrieved, **Default login.microsoftonline.com**|
+|apiVersion (Optional)|Non-Spaced string value|The API version of the data collection endpoint to use, **Default 2021-11-01-preview**|
+
+---
+
 ## <a id="azureeventhub"></a>Azure Event Hub
 Provides functionality to write to Azure Event Hubs
 
@@ -100,7 +149,8 @@ Provides functionality to write to Azure Event Hubs
   }
 ]
 ```
-[Published Documentation](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.eventhubs?view=azure-dotnet)
+### Documentation
+[Microsoft.Azure.EventHubs Namespace](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.eventhubs?view=azure-dotnet)
 
 ### Parameters
 |Parameter Name|Available Values|Description|
@@ -112,9 +162,10 @@ Provides functionality to write to Azure Event Hubs
 ---
 
 ## <a id="azureloganalytics"></a>Azure Log Analytics
-[Published Documentation](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/data-collector-api)
 Provides functionality to write to Azure Log Analytics workspace custom logs via the data collector API.
 
+### Documentation
+[Send log data to Azure Monitor by using the HTTP Data Collector API (preview)](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/data-collector-api)
 ### Structure
 ```json
 "sinks": [
@@ -139,7 +190,7 @@ Provides functionality to write to Azure Log Analytics workspace custom logs via
 |sharedKey|String value|The workspace shared key. Supports retrieving secret from environment variable using `env:MY_ENV_VAR_NAME` as the sharedKey value.|
 |logType|String value|The name of the custom log table|
 |timestampField (optional)|String value|The timestamp field to use|
-|requestTimeoutMs (optional)|String value|How long before the HttpClient waits before timing out. **Default 60000**|
+|requestTimeoutMs (optional)|Int value|How long before the HttpClient waits before timing out. **Default 60000**|
 |dnsSuffix (optional)|String value|The DNS suffix of the workspace URI. **Default ods.opinsights.azure.com**|
 |apiVersion (optional)|String value|The version of the data collector API. **Default 2016-04-01**|
 
@@ -147,6 +198,9 @@ Provides functionality to write to Azure Log Analytics workspace custom logs via
 
 ## <a id="azureservicebus"></a>Azure Service Bus
 Provides functionality to write to Azure Service Bus
+
+### Documentation
+[CreateMessageBatchOptions Class](https://docs.microsoft.com/en-us/dotnet/api/azure.messaging.servicebus.createmessagebatchoptions?view=azure-dotnet)
 
 ### Structure
 ```json
@@ -159,7 +213,6 @@ Provides functionality to write to Azure Service Bus
   }
 ]
 ```
-[Published Documentation](https://docs.microsoft.com/en-us/dotnet/api/azure.messaging.servicebus.createmessagebatchoptions?view=azure-dotnet)
 
 ### Parameters
 |Parameter Name|Available Values|Description|
