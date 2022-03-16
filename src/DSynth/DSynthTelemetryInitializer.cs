@@ -26,7 +26,7 @@ namespace DSynth
 
             _environmentNameValue = Environment.GetEnvironmentVariable("DATASYNTH_ENVIRONMENT_NAME")
                 ?? Environment.GetEnvironmentVariable("HOSTNAME")
-                ?? dataSynthEnvironmentName ?? "EnvironmentNameNotSet";
+                ?? dSynthEnvironmentName ?? "EnvironmentNameNotSet";
         }
 
         public void Initialize(ITelemetry telemetry)
