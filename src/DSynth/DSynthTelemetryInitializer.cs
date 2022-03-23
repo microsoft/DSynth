@@ -23,7 +23,10 @@ namespace DSynth
         public DSynthTelemetryInitializer(string dSynthEnvironmentName)
         {
             dSynthEnvironmentName = String.IsNullOrWhiteSpace(dSynthEnvironmentName) ? null : dSynthEnvironmentName;
-            _environmentNameValue = Environment.GetEnvironmentVariable("DSYNTH_ENVIRONMENT_NAME") ?? dSynthEnvironmentName ?? "EnvironmentNameNotSet";
+
+            _environmentNameValue = Environment.GetEnvironmentVariable("DATASYNTH_ENVIRONMENT_NAME")
+                ?? Environment.GetEnvironmentVariable("HOSTNAME")
+                ?? dSynthEnvironmentName ?? "EnvironmentNameNotSet";
         }
 
         public void Initialize(ITelemetry telemetry)
