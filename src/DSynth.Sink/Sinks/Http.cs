@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using DSynth.Sink.Options;
 using System.Net.Http.Headers;
+using DSynth.Common.Models;
+using Microsoft.ApplicationInsights;
 
 namespace DSynth.Sink.Sinks
 {
@@ -20,10 +22,11 @@ namespace DSynth.Sink.Sinks
         private const string _debugSendingPayloadMessage = "Sending to http endpoint: {AbsoluteUri}";
         private const string _debugSuccessfulSendRequest = "Successfully sent HTTP request to '{Uri}', status code '{StatusCode}', response message '{ResponseMessage}'";
         private const string _errorUnableToSendRequest = "RunAsync :: Unable to send HTTP request to '{Uri}', status code '{StatusCode}', response message '{ResponseMessage}'";
+        private readonly string _metricsName = String.Empty;
         private readonly Lazy<HttpClient> _lazyClient;
 
-        public Http(string providerName, HttpOptions options, ILogger logger, CancellationToken token)
-            : base(providerName, options, logger, token)
+        public Http(string providerName, HttpOptions options, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
+            : base(providerName, options, telemetryClient, logger, token)
         {
             _lazyClient = new Lazy<HttpClient>(() =>
             {
@@ -33,10 +36,14 @@ namespace DSynth.Sink.Sinks
 
                 return client;
             });
+
+            _metricsName = $"{ProviderName}-{Options.Type}-{Options.EndpointDns}";
         }
 
-        internal override async Task RunAsync(byte[] payload)
+        internal override async Task RunAsync(PayloadPackage payloadPackage)
         {
+            byte[] payload = payloadPackage.PayloadAsBytes;
+
             if (OptionsOverrides.TryGetValue(Resources.SinkBase.HeaderKey, out string header))
             {
                 payload = Encoding.UTF8.GetBytes(header).Concat(payload).ToArray();
@@ -47,23 +54,33 @@ namespace DSynth.Sink.Sinks
 
             Logger.LogDebug(_debugSendingPayloadMessage, fullUri.AbsoluteUri);
 
-            using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, fullUri))
+            try
             {
-                request.Content = new ByteArrayContent(payload);
-                request.Content.Headers.ContentType = new MediaTypeHeaderValue(Options.MimeType);
-
-                using (HttpResponseMessage response = await _lazyClient.Value.SendAsync(request).ConfigureAwait(false))
+                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, fullUri))
                 {
-                    string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    if (!response.IsSuccessStatusCode)
+                    request.Content = new ByteArrayContent(payload);
+                    request.Content.Headers.ContentType = new MediaTypeHeaderValue(Options.MimeType);
+
+                    using (HttpResponseMessage response = await _lazyClient.Value.SendAsync(request).ConfigureAwait(false))
                     {
-                        Logger.LogError(_errorUnableToSendRequest, fullUri.AbsoluteUri, (int)response.StatusCode, responseString);
-                    }
-                    else
-                    {
-                        Logger.LogDebug(_debugSuccessfulSendRequest, fullUri.AbsoluteUri, (int)response.StatusCode, responseString);
+                        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                            Logger.LogError(_errorUnableToSendRequest, fullUri.AbsoluteUri, (int)response.StatusCode, responseString);
+                        }
+                        else
+                        {
+                            RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
+                            Logger.LogDebug(_debugSuccessfulSendRequest, fullUri.AbsoluteUri, (int)response.StatusCode, responseString);
+                        }
                     }
                 }
+            }
+            catch (Exception)
+            {
+                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                throw;
             }
         }
     }

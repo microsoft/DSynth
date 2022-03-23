@@ -13,7 +13,7 @@ namespace DSynth.Reporter
 {
     public class ReportMetricAggregate
     {
-        private readonly int[] _availablePercentiles = new int[] {25, 50, 75, 99};
+        private readonly int[] _availablePercentiles = new int[] { 25, 50, 75, 99 };
         private readonly List<long> _sizeInBytes = new List<long>();
         private readonly List<long> _latencyInMs = new List<long>();
         private bool isReportBuilt = false;
@@ -29,6 +29,9 @@ namespace DSynth.Reporter
 
         [JsonProperty("totalBytes")]
         public long TotalBytes;
+
+        [JsonProperty("totalPayloadCount")]
+        public long TotalPayloadCount;
 
         [JsonProperty("timestamp")]
         [JsonConverter(typeof(ISO8601DateTimeConverter))]
@@ -48,17 +51,19 @@ namespace DSynth.Reporter
             ProviderName = metric.ProviderName;
             MetricName = metric.MetricName;
             TotalRequests = 1;
+            TotalPayloadCount = metric.PayloadCount;
             Timestamp = DateTimeOffset.FromUnixTimeSeconds(metric.IdAsTotalSeconds);
             _sizeInBytes.Add(metric.SizeInBytes);
             _latencyInMs.Add(metric.LatencyInMs);
             SampleWindowInSeconds = sampleWindowInSeconds;
-        }        
+        }
 
         public void AddMetric(ReportMetric metric)
         {
             _sizeInBytes.Add(metric.SizeInBytes);
             _latencyInMs.Add(metric.LatencyInMs);
             TotalRequests++;
+            TotalPayloadCount += metric.PayloadCount;
         }
 
         public string GetReportAsJson()
@@ -116,6 +121,6 @@ namespace DSynth.Reporter
                 double d = n - k;
                 return sequence[k - 1] + d * (sequence[k] - sequence[k - 1]);
             }
-        }        
+        }
     }
 }

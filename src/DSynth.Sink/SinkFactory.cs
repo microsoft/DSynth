@@ -26,31 +26,31 @@ namespace DSynth.Sink
                 {
                     case SinkType.Console:
                         ConsoleOptions consoleSinkOptions = ConsoleOptions.ParseAndValidateOptions<ConsoleOptions>(sinkOptions);
-                        return new Sinks.Console(providerName, consoleSinkOptions, logger, token);
+                        return new Sinks.Console(providerName, consoleSinkOptions, telemetryClient, logger, token);
 
                     case SinkType.HTTP:
                         HttpOptions httpSinkOptions = HttpOptions.ParseAndValidateOptions<HttpOptions>(sinkOptions);
-                        return new Http(providerName, httpSinkOptions, logger, token);
+                        return new Http(providerName, httpSinkOptions, telemetryClient, logger, token);
 
                     case SinkType.File:
                         FileOptions fileSinkOptions = FileOptions.ParseAndValidateOptions<FileOptions>(sinkOptions);
-                        return new File(providerName, fileSinkOptions, logger, token);
+                        return new File(providerName, fileSinkOptions, telemetryClient, logger, token);
 
                     case SinkType.AzureBlob:
                         AzureBlobOptions azureBlobSinkOptions = AzureBlobOptions.ParseAndValidateOptions<AzureBlobOptions>(sinkOptions);
-                        return new AzureBlob(providerName, azureBlobSinkOptions, logger, token);
+                        return new AzureBlob(providerName, azureBlobSinkOptions, telemetryClient, logger, token);
 
                     case SinkType.SocketServer:
                         SocketServerOptions socketServerSinkOptions = SocketServerOptions.ParseAndValidateOptions<SocketServerOptions>(sinkOptions);
-                        return new SocketServer(providerName, socketServerSinkOptions, logger, token);
+                        return new SocketServer(providerName, socketServerSinkOptions, telemetryClient, logger, token);
 
                     case SinkType.AzureEventHub:
                         AzureEventHubOptions azureEventHubOptions = AzureEventHubOptions.ParseAndValidateOptions<AzureEventHubOptions>(sinkOptions);
-                        return new AzureEventHub(providerName, azureEventHubOptions, logger, token);
+                        return new AzureEventHub(providerName, azureEventHubOptions, telemetryClient, logger, token);
 
                     case SinkType.AzureServiceBus:
                         AzureServiceBusOptions azurServiceBusOptions = AzureServiceBusOptions.ParseAndValidateOptions<AzureServiceBusOptions>(sinkOptions);
-                        return new AzureServiceBus(providerName, azurServiceBusOptions, logger, token);
+                        return new AzureServiceBus(providerName, azurServiceBusOptions, telemetryClient, logger, token);
 
                     case SinkType.AzureCosmosDb:
                         AzureCosmosDbOptions azureCosmosDbOptions = AzureCosmosDbOptions.ParseAndValidateOptions<AzureCosmosDbOptions>(sinkOptions);
@@ -58,11 +58,11 @@ namespace DSynth.Sink
 
                     case SinkType.AzureLogAnalytics:
                         AzureLogAnalyticsOptions azureLogAnalyticsOptions = AzureLogAnalyticsOptions.ParseAndValidateOptions<AzureLogAnalyticsOptions>(sinkOptions);
-                        return new AzureLogAnalytics(providerName, azureLogAnalyticsOptions, logger, token);
+                        return new AzureLogAnalytics(providerName, azureLogAnalyticsOptions, telemetryClient, logger, token);
 
                     default:
                         ConsoleOptions consoleSinkOptionsDef = ConsoleOptions.ParseAndValidateOptions<ConsoleOptions>(sinkOptions);
-                        return new Sinks.Console(providerName, consoleSinkOptionsDef, logger, token);
+                        return new Sinks.Console(providerName, consoleSinkOptionsDef, telemetryClient, logger, token);
 
                     case SinkType.AzureCustomLogs:
                         AzureCustomLogsOptions azureCustomLogsOptions = AzureCustomLogsOptions.ParseAndValidateOptions<AzureCustomLogsOptions>(sinkOptions);

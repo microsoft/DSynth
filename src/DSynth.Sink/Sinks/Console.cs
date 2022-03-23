@@ -9,18 +9,25 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using DSynth.Sink.Options;
 using System.Text;
+using DSynth.Common.Models;
+using Microsoft.ApplicationInsights;
+using System;
 
 namespace DSynth.Sink.Sinks
 {
     public class Console : SinkBase<ConsoleOptions>
     {
-        public Console(string providerName, ConsoleOptions options, ILogger logger, CancellationToken token)
-            : base(providerName, options, logger, token)
+        private readonly string _metricsName = String.Empty;
+        public Console(string providerName, ConsoleOptions options, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
+            : base(providerName, options, telemetryClient, logger, token)
         {
+            _metricsName = $"{ProviderName}-{Options.Type}";
         }
 
-        internal override async Task RunAsync(byte[] payload)
+        internal override async Task RunAsync(PayloadPackage payloadPackage)
         {
+            byte[] payload = payloadPackage.PayloadAsBytes;
+
             if (OptionsOverrides.TryGetValue(Resources.SinkBase.HeaderKey, out string header))
             {
                 payload = Encoding.UTF8.GetBytes(header).Concat(payload).ToArray();
@@ -30,6 +37,7 @@ namespace DSynth.Sink.Sinks
             if (Options.WriteToLog)
             {
                 await Task.Run(() => Logger.LogInformation(stringPayload)).ConfigureAwait(false);
+                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
             }
             if (Options.WriteToConsole)
             {

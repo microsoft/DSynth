@@ -31,7 +31,7 @@ namespace DSynth.Provider.Providers
             try
             {
                 _payload.Clear();
-                object nextPayload = ProviderQueue.Dequeue();
+                object nextPayload = ProviderQueue.Dequeue(out long payloadCount);
 
                 if (nextPayload is List<object>)
                 {
@@ -45,7 +45,7 @@ namespace DSynth.Provider.Providers
                 }
 
                 var stringPayload = String.Join(Environment.NewLine, _payload) + Environment.NewLine;
-                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(stringPayload), stringPayload);
+                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(stringPayload), payloadCount, stringPayload);
             }
             catch (Exception ex)
             {

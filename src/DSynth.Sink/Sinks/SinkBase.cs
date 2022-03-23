@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging;
 using DSynth.Reporter;
 using DSynth.Common.Utilities;
 using DSynth.Common.Models;
+using Microsoft.ApplicationInsights;
+using DSynth.Sink.Options;
 
 namespace DSynth.Sink.Sinks
 {
@@ -19,15 +21,19 @@ namespace DSynth.Sink.Sinks
         internal ILogger Logger;
         internal string ProviderName;
         internal T Options;
+
+        public TelemetryClient TelemetryClient { get; }
+
         internal IDictionary<string, string> OptionsOverrides;
         internal readonly CancellationToken Token;
         private readonly ReportManager _reportManager;
         private readonly string _metricName;
 
-        public SinkBase(string providerName, T sinkOptions, ILogger logger, CancellationToken token)
+        public SinkBase(string providerName, T sinkOptions, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
         {
             ProviderName = providerName;
             Options = sinkOptions;
+            TelemetryClient = telemetryClient;
             Logger = logger;
             Token = token;
             OptionsOverrides = new Dictionary<string, string>();
@@ -35,16 +41,16 @@ namespace DSynth.Sink.Sinks
             _metricName = this.GetType().Name;
         }
 
-        internal abstract Task RunAsync(byte[] payload);
+        internal abstract Task RunAsync(PayloadPackage payloadPackage);
 
-        public async Task SendPayloadAsync(PayloadPackage package)
+        public async Task SendPayloadAsync(PayloadPackage payloadPackage)
         {
-            ReportMetric reportMetric = ReportMetric.StartNew(ProviderName, _metricName, package.PayloadAsBytes.LongLength);
-            if (package.Overrides != null) OptionsOverrides = new Dictionary<string, string>(package.Overrides);
+            ReportMetric reportMetric = ReportMetric.StartNew(ProviderName, _metricName, payloadPackage.PayloadAsBytes.LongLength, payloadPackage.PayloadCount);
+            if (payloadPackage.Overrides != null) OptionsOverrides = new Dictionary<string, string>(payloadPackage.Overrides);
 
             try
             {
-                await RunAsync(package.PayloadAsBytes).ConfigureAwait(false);
+                await RunAsync(payloadPackage).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -80,6 +86,17 @@ namespace DSynth.Sink.Sinks
                 .Replace(Resources.SinkBase.MinuteToken, timestampArray[4])
                 .Replace(Resources.SinkBase.SecondToken, timestampArray[5])
                 .Replace(Resources.SinkBase.MillisecondToken, timestampArray[6]);
+        }
+
+        internal void RecordSentMetrics(string metricsName, long totalSendCount, long totalPayloadCount, bool isSuccess)
+        {
+            TelemetryClient.TrackEvent(metricsName,
+                new Dictionary<string, string> {
+                    { "IsSuccess", $"{isSuccess.ToString()}" },
+                    { "ProviderName", ProviderName } },
+                new Dictionary<string, double> {
+                    { "TotalSendCount", totalSendCount },
+                    { "TotalPayloadCount", totalPayloadCount } });
         }
     }
 }

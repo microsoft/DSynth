@@ -13,6 +13,8 @@ using Azure.Storage.Blobs;
 using Microsoft.Extensions.Logging;
 using DSynth.Sink.Options;
 using System.Text;
+using DSynth.Common.Models;
+using Microsoft.ApplicationInsights;
 
 namespace DSynth.Sink.Sinks
 {
@@ -22,12 +24,13 @@ namespace DSynth.Sink.Sinks
         private const string _warnContainerDoesNotExist = "Container '{ContainerName}' does not exist, attempting to create container.";
         private const string _exMessageContainerDoesNotExistString = "The specified container does not exist.";
         private string _infoBlobContainerCreated = "Container '{ContainerName}' created";
-        private Lazy<BlobContainerClient> lazyClient;
+        private readonly string _metricsName = String.Empty;
+        private Lazy<BlobContainerClient> _lazyClient;
 
-        public AzureBlob(string providerName, AzureBlobOptions options, ILogger logger, CancellationToken token)
-            : base(providerName, options, logger, token)
+        public AzureBlob(string providerName, AzureBlobOptions options, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
+            : base(providerName, options, telemetryClient, logger, token)
         {
-            lazyClient = new Lazy<BlobContainerClient>(() =>
+            _lazyClient = new Lazy<BlobContainerClient>(() =>
             {
                 if (String.IsNullOrEmpty(Options.ConnectionString))
                 {
@@ -43,11 +46,14 @@ namespace DSynth.Sink.Sinks
                 }
             });
 
-            lazyClient.Value.CreateIfNotExistsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            _lazyClient.Value.CreateIfNotExistsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            _metricsName = $"{ProviderName}-{Options.Type}-{_lazyClient.Value.AccountName}-{_lazyClient.Value.Name}";
         }
 
-        internal override async Task RunAsync(byte[] payload)
+        internal override async Task RunAsync(PayloadPackage payloadPackage)
         {
+            byte[] payload = payloadPackage.PayloadAsBytes;
+
             // Read filename suffix from OptionsOverrides and default to the value in Options.
             if (!OptionsOverrides.TryGetValue(Resources.SinkBase.FilenameSuffixKey, out string filenameSuffix))
             {
@@ -68,16 +74,20 @@ namespace DSynth.Sink.Sinks
             {
                 using (MemoryStream ms = new MemoryStream(payload))
                 {
-                    await lazyClient.Value.UploadBlobAsync(fullPath, ms, Token)
+                    await _lazyClient.Value.UploadBlobAsync(fullPath, ms, Token)
                         .ConfigureAwait(false);
                 }
+
+                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
             }
             catch (Azure.RequestFailedException ex)
             {
+                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                
                 if (ex.Message.Contains(_exMessageContainerDoesNotExistString))
                 {
                     Logger.LogWarning(_warnContainerDoesNotExist, Options.BlobContainerName);
-                    await lazyClient.Value.CreateIfNotExistsAsync().ConfigureAwait(false);
+                    await _lazyClient.Value.CreateIfNotExistsAsync().ConfigureAwait(false);
                     Logger.LogInformation(_infoBlobContainerCreated, Options.BlobContainerName);
                 }
             }

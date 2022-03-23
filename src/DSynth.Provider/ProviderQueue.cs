@@ -91,25 +91,26 @@ namespace DSynth.Provider
             return ret;
         }
 
-        public object Dequeue()
+        public object Dequeue(out long payloadCount)
         {
             object ret;
             try
             {
                 if (_options.MaxBatchSize == 0 && _options.MinBatchSize == 1)
                 {
+                    payloadCount = 1;
                     ret = TryDequeue();
                 }
                 else
                 {
                     // If the MaxBatchSize = 0, this means that the MaxBatchSize
                     // is disabled and generate a collection the static size of MinBatchSize.
-                    int nextSize = _options.MaxBatchSize == 0 ?
+                    payloadCount = _options.MaxBatchSize == 0 ?
                         _options.MinBatchSize : _random.Next(_options.MinBatchSize, _options.MaxBatchSize);
 
                     _payloadCollection.Clear();
 
-                    while (_payloadCollection.Count < nextSize && !_token.IsCancellationRequested)
+                    while (_payloadCollection.Count < payloadCount && !_token.IsCancellationRequested)
                     {
                         _payloadCollection.Add(TryDequeue());
                     }

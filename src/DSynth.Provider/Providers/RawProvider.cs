@@ -26,8 +26,8 @@ namespace DSynth.Provider.Providers
         {
             try
             {
-                string payloadString = (string)ProviderQueue.Dequeue();
-                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(payloadString), payloadString);
+                string payloadString = (string)ProviderQueue.Dequeue(out long payloadCount);
+                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(payloadString), payloadCount, payloadString);
             }
             catch (Exception ex)
             {

@@ -9,7 +9,9 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using DSynth.Common.Models;
 using DSynth.Sink.Options;
+using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Logging;
 
 namespace DSynth.Sink.Sinks
@@ -21,12 +23,13 @@ namespace DSynth.Sink.Sinks
         private const string _errorUnableToSendRequest = "RunAsync :: Unable to send Log Analytics request to '{Uri}', status code '{StatusCode}', response message '{ResponseMessage}'";
         private const string _endpointTemplate = "https://{0}.{1}/api/logs?api-version={2}";
         private const string _signatureStringTemplate = "POST\n{0}\napplication/json\nx-ms-date:{1}\n/api/logs";
+        private readonly string _metricsName = String.Empty;
         private static Lazy<HttpClient> _lazyClient;
         private readonly Uri _workspaceEndpoint;
         private static readonly object _lockObject = new object();
 
-        public AzureLogAnalytics(string providerName, AzureLogAnalyticsOptions sinkOptions, ILogger logger, CancellationToken token)
-            : base(providerName, sinkOptions, logger, token)
+        public AzureLogAnalytics(string providerName, AzureLogAnalyticsOptions sinkOptions, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
+            : base(providerName, sinkOptions, telemetryClient, logger, token)
         {
             lock (_lockObject)
             {
@@ -48,39 +51,52 @@ namespace DSynth.Sink.Sinks
                     Options.WorkspaceId,
                     Options.DnsSuffix,
                     Options.ApiVersion));
+
+                _metricsName = $"{ProviderName}-{Options.Type}-{Options.LogType}";
             }
         }
 
-        internal override async Task RunAsync(byte[] payload)
+        internal override async Task RunAsync(PayloadPackage payloadPackage)
         {
+            byte[] payload = payloadPackage.PayloadAsBytes;
             var rfcDate = DateTime.UtcNow.ToString("r");
             string signatureString = String.Format(CultureInfo.InvariantCulture, _signatureStringTemplate, payload.Length, rfcDate);
             string hashedString = BuildSignature(signatureString, Options.SharedKey);
             string signature = $"SharedKey {Options.WorkspaceId}:{hashedString}";
 
-            using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post,_workspaceEndpoint))
+            try
             {
-                request.Headers.Add("Accept", "application/json");
-                request.Headers.Add("Log-Type", Options.LogType);
-                request.Headers.Add("Authorization", signature);
-                request.Headers.Add("x-ms-date", rfcDate);
-                request.Headers.Add("time-generated-field", Options.TimestampField);
-                request.Content = new ByteArrayContent(payload);
-                request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-
-                Logger.LogDebug(_debugSendingPayloadMessage, _workspaceEndpoint.AbsoluteUri);
-                using (HttpResponseMessage response = await _lazyClient.Value.SendAsync(request))
+                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _workspaceEndpoint))
                 {
-                    var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    if (!response.IsSuccessStatusCode)
+                    request.Headers.Add("Accept", "application/json");
+                    request.Headers.Add("Log-Type", Options.LogType);
+                    request.Headers.Add("Authorization", signature);
+                    request.Headers.Add("x-ms-date", rfcDate);
+                    request.Headers.Add("time-generated-field", Options.TimestampField);
+                    request.Content = new ByteArrayContent(payload);
+                    request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+                    Logger.LogDebug(_debugSendingPayloadMessage, _workspaceEndpoint.AbsoluteUri);
+                    using (HttpResponseMessage response = await _lazyClient.Value.SendAsync(request))
                     {
-                        Logger.LogError(_errorUnableToSendRequest, _workspaceEndpoint.AbsoluteUri, (int)response.StatusCode, responseString);
-                    }
-                    else
-                    {
-                        Logger.LogDebug(_debugSuccessfulSendRequest, _workspaceEndpoint.AbsoluteUri, (int)response.StatusCode, responseString);
+                        var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
+                            Logger.LogError(_errorUnableToSendRequest, _workspaceEndpoint.AbsoluteUri, (int)response.StatusCode, responseString);
+                        }
+                        else
+                        {
+                            RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                            Logger.LogDebug(_debugSuccessfulSendRequest, _workspaceEndpoint.AbsoluteUri, (int)response.StatusCode, responseString);
+                        }
                     }
                 }
+            }
+            catch (Exception)
+            {
+                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                throw;
             }
         }
 
