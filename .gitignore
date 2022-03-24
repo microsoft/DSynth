@@ -348,3 +348,29 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# DSynth specific, DO NOT touch
+src/DSynth/Profiles/*
+!src/DSynth/Profiles/sample-profile.json
+!src/DSynth/Profiles/Templates/
+src/DSynth/Profiles/Templates/*
+!src/DSynth/Profiles/Templates/JsonSample.template.json
+!src/DSynth/Profiles/Templates/JsonSampleNested.template.json
+!src/DSynth/Profiles/Templates/XmlSample.template.xml
+!src/DSynth/Profiles/Templates/CsvSample.template.csv
+!src/DSynth/Profiles/Templates/ImageSample.template.image
+!src/DSynth/Profiles/Templates/RawSample.template.raw
+!src/DSynth/Profiles/Templates/Collections
+src/DSynth/Profiles/Templates/Collections/*
+!src/DSynth/Profiles/Templates/Collections/Sample.collections.json
+!src/DSynth/Profiles/Templates/Collections/Sample.collections.csv
+
+
+file-sink-output
+
+# other
+appsettings.Development.json
+*appsettings.Development.json
+test.json
+test.xml
+.DS_Store

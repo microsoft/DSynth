@@ -5,6 +5,7 @@ DSynth is a template driven data generator. DSynth accepts templates of various 
 ```
 - Azure Blob
 - Azure Cosmos DB
+- Azure Custom Logs
 - Azure Event Hubs
 - Azure Log Analytics
 - Azure Service Bus
