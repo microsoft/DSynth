@@ -18,9 +18,11 @@ namespace DSynth.Sink.Options
         [JsonIgnore]
         public string ConnectionString => EvaluateAndRetrieveValue(_connectionString);
 
-
         [JsonProperty("eventBatchSizeInBytes")]
         public long EventBatchSizeInBytes { get; set; }
+
+        [JsonProperty("operationTimeoutMs")]
+        public int OperationTimeoutMs { get; set; } = 60000;
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -36,6 +38,10 @@ namespace DSynth.Sink.Options
             if (EventBatchSizeInBytes <= 0)
             {
                 yield return new ValidationResult("EventBatchSizeInBytes must be > 0");
+            }
+            if (OperationTimeoutMs <= 0)
+            {
+                yield return new ValidationResult("OperationTimeoutMs must be > 0");
             }
         }
     }
