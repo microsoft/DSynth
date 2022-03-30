@@ -37,7 +37,12 @@ namespace DSynth.Sink.Sinks
             _eventDataBatch = new EventDataBatch(_options.EventBatchSizeInBytes);
             _eventDataBatchFull += HandleEventDataBatchFull;
 
-            _client = EventHubClient.CreateFromConnectionString(_options.ConnectionString);
+            EventHubsConnectionStringBuilder csb = new EventHubsConnectionStringBuilder(_options.ConnectionString)
+            {
+                OperationTimeout = TimeSpan.FromMilliseconds(_options.OperationTimeoutMs)
+            };
+
+            _client = EventHubClient.Create(csb);
             _client.RetryPolicy = RetryPolicy.Default;
 
             _metricsName = $"{ProviderName}-{Options.Type}-{_client.EventHubName}";

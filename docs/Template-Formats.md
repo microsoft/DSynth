@@ -48,8 +48,8 @@ Images are a unique provider type and we use JSON format to describe what an ima
 }
 ```
 
-Output:
-![image.png](/.attachments/image-7dbc1ca7-45d3-4fff-ad3f-14137fafa048.png)
+Output:<br />
+![sample-image-output.png](./images/sample-image-output.png)
 
 ---
 

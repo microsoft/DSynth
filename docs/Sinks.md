@@ -145,7 +145,8 @@ Provides functionality to write to Azure Event Hubs
   {
     "type": "AzureEventHub",
     "connectionString": "{CONECTIONSTRING}",
-    "eventBatchSizeInBytes": 131072
+    "eventBatchSizeInBytes": 131072,
+    "operationTimeoutMs": 60000
   }
 ]
 ```
@@ -158,6 +159,7 @@ Provides functionality to write to Azure Event Hubs
 |type|AzureEventHub|Specifies the sink type of AzureEventHub|
 |connectionString|String value|Connection string for the desired Event Hub where payloads get written to. Supports retrieving secret from environment variable using `env:MY_ENV_VAR_NAME` as the connectionString value.|
 |eventBatchSizeInBytes|long value|How large the batch size is that gets sent to Event Hubs|
+|operationTimeoutMs (Optional)|Int value|Sets the Event Hub client timeout in milliseconds, **Default 60000**|
 
 ---
 
