@@ -37,7 +37,6 @@ namespace DSynth.Sink.Sinks
             if (Options.WriteToLog)
             {
                 await Task.Run(() => Logger.LogInformation(stringPayload)).ConfigureAwait(false);
-                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
             }
             if (Options.WriteToConsole)
             {

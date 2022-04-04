@@ -20,7 +20,7 @@ namespace DSynth
 
             // Log Messages
             public const string InfoRestartingDSynth = "Restarting DSynth";
-            public const string TraceRetrievingPayloadPackage = "ProviderSinkTask :: Retrieving payload package took {0}ms";
+            public const string DebugRetrievingPayloadPackage = "ProviderSinkTask :: Retrieving payload package took {0}ms";
         }
 
         public static class ProfileService

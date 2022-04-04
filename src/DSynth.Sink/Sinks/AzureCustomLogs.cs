@@ -105,12 +105,11 @@ namespace DSynth.Sink.Sinks
                         string responseHeadersString = response.Headers.ToString();
                         if (!response.IsSuccessStatusCode)
                         {
-                            RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                            RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
                             Logger.LogError(_errorUnableToSendRequest, _customLogEndpoint.AbsoluteUri, (int)response.StatusCode, responseString, responseHeadersString);
                         }
                         else
                         {
-                            RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
                             Logger.LogDebug(_debugSuccessfulSendRequest, _customLogEndpoint.AbsoluteUri, (int)response.StatusCode, responseString, responseHeadersString);
                         }
                     }
@@ -118,7 +117,7 @@ namespace DSynth.Sink.Sinks
             }
             catch (Exception)
             {
-                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
                 throw;
             }
         }

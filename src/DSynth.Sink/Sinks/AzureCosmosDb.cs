@@ -96,12 +96,11 @@ namespace DSynth.Sink.Sinks
                     _options.MaxInMemorySortingBatchSize,
                     Token).Result;
 
-                RecordSentMetrics(_metricsName, _bulkDocumentsList.Count, _totalPayloadCount, true);
                 SendMetrics(bulkImportResponse);
             }
             catch (Exception)
             {
-                RecordSentMetrics(_metricsName, _bulkDocumentsList.Count, _totalPayloadCount, true);
+                RecordFailedSend(_metricsName, _bulkDocumentsList.Count, _totalPayloadCount);
                 throw;
             }
             finally

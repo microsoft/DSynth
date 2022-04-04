@@ -77,12 +77,10 @@ namespace DSynth.Sink.Sinks
                     await _lazyClient.Value.UploadBlobAsync(fullPath, ms, Token)
                         .ConfigureAwait(false);
                 }
-
-                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
             }
             catch (Azure.RequestFailedException ex)
             {
-                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
                 
                 if (ex.Message.Contains(_exMessageContainerDoesNotExistString))
                 {

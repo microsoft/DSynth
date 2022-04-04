@@ -66,12 +66,11 @@ namespace DSynth.Sink.Sinks
                         string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                         if (!response.IsSuccessStatusCode)
                         {
-                            RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                            RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
                             Logger.LogError(_errorUnableToSendRequest, fullUri.AbsoluteUri, (int)response.StatusCode, responseString);
                         }
                         else
                         {
-                            RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
                             Logger.LogDebug(_debugSuccessfulSendRequest, fullUri.AbsoluteUri, (int)response.StatusCode, responseString);
                         }
                     }
@@ -79,7 +78,7 @@ namespace DSynth.Sink.Sinks
             }
             catch (Exception)
             {
-                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
                 throw;
             }
         }

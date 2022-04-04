@@ -72,11 +72,10 @@ namespace DSynth.Sink.Sinks
             try
             {
                 _client.SendAsync(_eventDataBatch).ConfigureAwait(false).GetAwaiter().GetResult();
-                RecordSentMetrics(_metricsName, _eventDataBatch.Count, _totalPayloadCount, true);
             }
             catch (Exception)
             {
-                RecordSentMetrics(_metricsName, _eventDataBatch.Count, _totalPayloadCount, false);
+                RecordFailedSend(_metricsName, _eventDataBatch.Count, _totalPayloadCount);
                 throw;
             }
             finally

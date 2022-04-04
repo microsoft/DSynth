@@ -62,11 +62,10 @@ namespace DSynth.Sink.Sinks
             try
             {
                 _serviceBusSender.SendMessagesAsync(e.ServiceBusMessageBatch).Wait();
-                RecordSentMetrics(_metricsName, _messageBatch.Count, _totalPayloadCount, true);
             }
             catch (Exception)
             {
-                RecordSentMetrics(_metricsName, _messageBatch.Count, _totalPayloadCount, false);
+                RecordFailedSend(_metricsName, _messageBatch.Count, _totalPayloadCount);
                 throw;
             }
             finally

@@ -63,11 +63,10 @@ namespace DSynth.Sink.Sinks
                     }
                 }
                 
-                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
             }
             catch (Exception)
             {
-                RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
                 throw;
             }
         }

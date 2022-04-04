@@ -88,11 +88,11 @@ namespace DSynth.Sink.Sinks
                 .Replace(Resources.SinkBase.MillisecondToken, timestampArray[6]);
         }
 
-        internal void RecordSentMetrics(string metricsName, long totalSendCount, long totalPayloadCount, bool isSuccess)
+        internal void RecordFailedSend(string metricsName, long totalSendCount, long totalPayloadCount)
         {
             TelemetryClient.TrackEvent(metricsName,
                 new Dictionary<string, string> {
-                    { "IsSuccess", $"{isSuccess.ToString()}" },
+                    { "IsSuccess", $"false" },
                     { "ProviderName", ProviderName } },
                 new Dictionary<string, double> {
                     { "TotalSendCount", totalSendCount },

@@ -104,18 +104,16 @@ namespace DSynth.Sink.Sinks
                     try
                     {
                         await _connectedSocket.SendAsync(payload, SocketFlags.None).ConfigureAwait(false);
-                        RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, true);
                     }
                     catch (Exception ex)
                     {
-                        RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
+                        RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
                         Logger.LogWarning(_warnLostConnection, ProviderName, ex.Message);
                         ResetSocket();
                     }
                 }
                 else
                 {
-                    RecordSentMetrics(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount, false);
                     ResetSocket();
                 }
             }

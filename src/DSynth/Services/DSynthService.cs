@@ -142,7 +142,7 @@ namespace DSynth.Services
                 {
                     var sw = Stopwatch.StartNew();
                     PayloadPackage PayloadPackage = package.Provider.Package;
-                    _logger.LogTrace(Resources.DSynthService.TraceRetrievingPayloadPackage, sw.ElapsedMilliseconds);
+                    _logger.LogDebug(Resources.DSynthService.DebugRetrievingPayloadPackage, sw.ElapsedMilliseconds);
 
                     if (PayloadPackage.PayloadAsBytes.Length > 4)
                     {
