@@ -38,7 +38,7 @@ namespace DSynth.Provider.Providers
             {
                 _payload.Clear();
                 _payloadStringBuilder.Clear();
-                object nextPayload = ProviderQueue.Dequeue();
+                object nextPayload = ProviderQueue.Dequeue(out long payloadCount);
 
                 if (nextPayload is System.String)
                 {
@@ -63,7 +63,7 @@ namespace DSynth.Provider.Providers
                     }
                 }
 
-                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(_payloadStringBuilder.ToString()), _payloadStringBuilder.ToString(), overrides =>
+                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(_payloadStringBuilder.ToString()), payloadCount, _payloadStringBuilder.ToString(), overrides =>
                 {
                     overrides.Add("Header", $"{ExtractHeader()}");
                 });

@@ -10,21 +10,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using DSynth.Common.Models;
+using Microsoft.ApplicationInsights;
 
 namespace DSynth.Sink.Sinks
 {
     public class File : SinkBase<Options.FileOptions>
     {
         private const string _folderPathDelimeter = "/";
+        private readonly string _metricsName = String.Empty;
 
-        public File(string providerName, Options.FileOptions options, ILogger logger, CancellationToken token)
-            : base(providerName, options, logger, token)
+        public File(string providerName, Options.FileOptions options, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
+            : base(providerName, options, telemetryClient, logger, token)
         {
             Directory.CreateDirectory(Options.BaseFolderPath);
         }
 
-        internal override async Task RunAsync(byte[] payload)
+        internal override async Task RunAsync(PayloadPackage payloadPackage)
         {
+            byte[] payload = payloadPackage.PayloadAsBytes;
+
             // Read filename suffix from OptionsOverrides and default to the value in Options.
             if (!OptionsOverrides.TryGetValue(Resources.SinkBase.FilenameSuffixKey, out string filenameSuffix))
             {
@@ -39,22 +44,30 @@ namespace DSynth.Sink.Sinks
             var fullFolderPath = Path.Combine(Options.BaseFolderPath, subfolderPath ?? String.Empty);
             var fullPath = $"{fullFolderPath}{_folderPathDelimeter}{filename}";
 
-            if (!Directory.Exists(fullFolderPath)) { Directory.CreateDirectory(fullFolderPath); }
-
-
-            if (!Directory.GetFiles(fullFolderPath, filename).Any() && !String.IsNullOrWhiteSpace(header))
+            try
             {
-                using (FileStream fileStream = new FileStream(fullPath, Options.FileMode, FileAccess.Write, FileShare.None))
+                if (!Directory.Exists(fullFolderPath)) { Directory.CreateDirectory(fullFolderPath); }
+
+                if (!Directory.GetFiles(fullFolderPath, filename).Any() && !String.IsNullOrWhiteSpace(header))
                 {
-                    await fileStream.WriteAsync(Encoding.UTF8.GetBytes(header).Concat(payload).ToArray(), 0, header.Length + payload.Length, Token);
+                    using (FileStream fileStream = new FileStream(fullPath, Options.FileMode, FileAccess.Write, FileShare.None))
+                    {
+                        await fileStream.WriteAsync(Encoding.UTF8.GetBytes(header).Concat(payload).ToArray(), 0, header.Length + payload.Length, Token);
+                    }
                 }
+                else
+                {
+                    using (FileStream fileStream = new FileStream(fullPath, Options.FileMode, FileAccess.Write, FileShare.None))
+                    {
+                        await fileStream.WriteAsync(payload, 0, payload.Length, Token);
+                    }
+                }
+                
             }
-            else
+            catch (Exception)
             {
-                using (FileStream fileStream = new FileStream(fullPath, Options.FileMode, FileAccess.Write, FileShare.None))
-                {
-                    await fileStream.WriteAsync(payload, 0, payload.Length, Token);
-                }
+                RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
+                throw;
             }
         }
     }

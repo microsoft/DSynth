@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+
 using System;
 using System.Linq;
 using System.Net;
@@ -12,6 +13,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using DSynth.Sink.Options;
+using DSynth.Common.Models;
+using Microsoft.ApplicationInsights;
 
 namespace DSynth.Sink.Sinks
 {
@@ -22,17 +25,19 @@ namespace DSynth.Sink.Sinks
         private const string _warnNoClientsConnected = "No clients connected to socket server for provider {ProviderName}";
         private const string _warnLostConnection = "The connected client is no longer connected for provider {PayloadProvider}. This could have been a transient issue or the client closed the connection, exception message '{ExMessage}'";
         private const string _infoResettingSocket = "Resetting socket for provider {PayloadProvider} to allow incomming connections";
+        private readonly string _metricsName = String.Empty;
         private Socket _socket;
         private Socket _connectedSocket;
         private SocketServerOptions _options;
 
-        public SocketServer(string providerName, SocketServerOptions sinkOptions, ILogger logger, CancellationToken token)
-            : base(providerName, sinkOptions, logger, token)
+        public SocketServer(string providerName, SocketServerOptions sinkOptions, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
+            : base(providerName, sinkOptions, telemetryClient, logger, token)
         {
             _options = sinkOptions;
 
             SetupServer();
             RegisterCancellationEvent(token);
+            _metricsName = $"{ProviderName}-{Options.Type}";
         }
 
         private void RegisterCancellationEvent(CancellationToken token)
@@ -83,8 +88,10 @@ namespace DSynth.Sink.Sinks
             _socket.BeginAccept(new AsyncCallback(ConnectedCallback), null);
         }
 
-        internal override async Task RunAsync(byte[] payload)
+        internal override async Task RunAsync(PayloadPackage payloadPackage)
         {
+            byte[] payload = payloadPackage.PayloadAsBytes;
+
             if (OptionsOverrides.TryGetValue(Resources.SinkBase.HeaderKey, out string header))
             {
                 payload = Encoding.UTF8.GetBytes(header).Concat(payload).ToArray();
@@ -100,6 +107,7 @@ namespace DSynth.Sink.Sinks
                     }
                     catch (Exception ex)
                     {
+                        RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
                         Logger.LogWarning(_warnLostConnection, ProviderName, ex.Message);
                         ResetSocket();
                     }
@@ -113,7 +121,7 @@ namespace DSynth.Sink.Sinks
             {
                 Logger.LogWarning(_warnNoClientsConnected, ProviderName);
                 await Task.Delay(5000).ConfigureAwait(false);
-                await RunAsync(payload).ConfigureAwait(false);
+                await RunAsync(payloadPackage).ConfigureAwait(false);
             }
         }
     }

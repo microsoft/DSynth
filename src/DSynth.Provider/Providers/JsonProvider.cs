@@ -28,8 +28,8 @@ namespace DSynth.Provider.Providers
             try
             {
                 var options = new JsonSerializerOptions { WriteIndented = true };
-                string stringPayload = JsonSerializer.Serialize(ProviderQueue.Dequeue(), options);
-                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(stringPayload), stringPayload);
+                string stringPayload = JsonSerializer.Serialize(ProviderQueue.Dequeue(out long payloadCount), options);
+                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(stringPayload), payloadCount, stringPayload);
             }
             catch (Exception ex)
             {

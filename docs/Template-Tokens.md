@@ -43,8 +43,8 @@ Gets substituted with a number int or double.
 
 |TokenHandlerType|Source|Start and End Range|Deviation Amount|Deviation Weight|Token|
 |--|--|--|--|--|--|
-|Number|IncrementTracked|Number value specifying start and end, i.e. `1.0..2.0` or `1..10`|The range that the value will deviate, i.e. `0.001..0.003` or `1..3`|How often the value will deviate, i.e. `1` will be 1% of the time. Setting this to `100` will deviate 100% of the time.|{{Number:IncrementTracked:1.0..2.0:0.1..0.3:0.1:trackedKeyName}}|
-|Number|DecrementTracked|Number value specifying start and end, i.e. `1.0..2.0` or `1..10`|The range that the value will deviate, i.e. `0.001..0.003` or `1..3`|How often the value will deviate, i.e. `1` will be 1% of the time. Setting this to `100` will deviate 100% of the time.|{{Number:DecrementTracked:2.0..1.0:0.1..0.3:0.1:trackedKeyName}}|
+|Number|IncrementTracked|Number value specifying start and end, i.e. `1.0..2.0` or `1..10`|The range that the value will deviate, i.e. `0.001..0.003` or `1..3`|How often the value will deviate, i.e. `1` will be 1% of the time. Setting this to `1` will deviate 100% of the time.|{{Number:IncrementTracked:1.0..2.0:0.1..0.3:0.1:trackedKeyName}}|
+|Number|DecrementTracked|Number value specifying start and end, i.e. `1.0..2.0` or `1..10`|The range that the value will deviate, i.e. `0.001..0.003` or `1..3`|How often the value will deviate, i.e. `1` will be 1% of the time. Setting this to `1` will deviate 100% of the time.|{{Number:DecrementTracked:2.0..1.0:0.1..0.3:0.1:trackedKeyName}}|
 |Number|Reference|N/A|N/A|N/A|{{Number:Reference:trackedKeyName}}
 
 ## JsonCollection

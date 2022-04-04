@@ -10,6 +10,7 @@ using System.IO.Compression;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using DSynth.Common.Models;
 using DSynth.Sink.Options;
 using DSynth.Sink.Utilities;
 using Microsoft.ApplicationInsights;
@@ -23,13 +24,14 @@ namespace DSynth.Sink.Sinks
         private const string _debugSuccessfulSendRequest = "Successfully sent custom logs request to '{Uri}', status code '{StatusCode}', response message '{ResponseMessage}', response headers '{ResponseHeaders}'";
         private const string _errorUnableToSendRequest = "RunAsync :: Unable to send custom logs request to '{Uri}', status code '{StatusCode}', response message '{ResponseMessage}', response headers '{ResponseHeaders}'";
         private const string _dceUriTemplate = "{0}/dataCollectionRules/{1}/streams/Custom-{2}?api-version={3}";
+        private readonly string _metricsName = String.Empty;
         private static Lazy<HttpClient> _lazyClient;
         private readonly Uri _customLogEndpoint;
         private BearerRefresher _bearerRefresher;
         private static readonly object _lockObject = new object();
 
         public AzureCustomLogs(string providerName, AzureCustomLogsOptions sinkOptions, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
-            : base(providerName, sinkOptions, logger, token)
+            : base(providerName, sinkOptions, telemetryClient, logger, token)
         {
             lock (_lockObject)
             {
@@ -53,6 +55,7 @@ namespace DSynth.Sink.Sinks
                     Options.CustomTableName,
                     Options.ApiVersion));
 
+                _metricsName = $"{ProviderName}-{Options.Type}-{Options.CustomTableName}";
                 InitializeBearerRefresher();
             }
         }
@@ -74,37 +77,48 @@ namespace DSynth.Sink.Sinks
             }
         }
 
-        internal override async Task RunAsync(byte[] payload)
+        internal override async Task RunAsync(PayloadPackage payloadPackage)
         {
-            using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _customLogEndpoint))
+            byte[] payload = payloadPackage.PayloadAsBytes;
+
+            try
             {
-                if (Options.EnableCompression)
+                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, _customLogEndpoint))
                 {
-                    request.Content = new ByteArrayContent(Compress(payload));
-                    request.Content.Headers.ContentEncoding.Add("gzip");
-                }
-                else
-                {
-                    request.Content = new ByteArrayContent(payload);
-                }
-
-                request.Headers.Add("Authorization", $"Bearer {_bearerRefresher.BearerResponse.AccessToken}");
-                request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-
-                Logger.LogDebug(_debugSendingRequest, _customLogEndpoint.AbsoluteUri);
-                using (HttpResponseMessage response = await _lazyClient.Value.SendAsync(request).ConfigureAwait(false))
-                {
-                    string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    string responseHeadersString = response.Headers.ToString();
-                    if (!response.IsSuccessStatusCode)
+                    if (Options.EnableCompression)
                     {
-                        Logger.LogError(_errorUnableToSendRequest, _customLogEndpoint.AbsoluteUri, (int)response.StatusCode, responseString, responseHeadersString);
+                        request.Content = new ByteArrayContent(Compress(payload));
+                        request.Content.Headers.ContentEncoding.Add("gzip");
                     }
                     else
                     {
-                        Logger.LogDebug(_debugSuccessfulSendRequest, _customLogEndpoint.AbsoluteUri, (int)response.StatusCode, responseString, responseHeadersString);
+                        request.Content = new ByteArrayContent(payload);
+                    }
+
+                    request.Headers.Add("Authorization", $"Bearer {_bearerRefresher.BearerResponse.AccessToken}");
+                    request.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+                    Logger.LogDebug(_debugSendingRequest, _customLogEndpoint.AbsoluteUri);
+                    using (HttpResponseMessage response = await _lazyClient.Value.SendAsync(request).ConfigureAwait(false))
+                    {
+                        string responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        string responseHeadersString = response.Headers.ToString();
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
+                            Logger.LogError(_errorUnableToSendRequest, _customLogEndpoint.AbsoluteUri, (int)response.StatusCode, responseString, responseHeadersString);
+                        }
+                        else
+                        {
+                            Logger.LogDebug(_debugSuccessfulSendRequest, _customLogEndpoint.AbsoluteUri, (int)response.StatusCode, responseString, responseHeadersString);
+                        }
                     }
                 }
+            }
+            catch (Exception)
+            {
+                RecordFailedSend(_metricsName, payloadPackage.PayloadCount, payloadPackage.PayloadCount);
+                throw;
             }
         }
 

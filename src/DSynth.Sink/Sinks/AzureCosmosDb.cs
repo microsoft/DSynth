@@ -16,25 +16,29 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.ApplicationInsights;
+using DSynth.Common.Models;
 
 namespace DSynth.Sink.Sinks
 {
     public class AzureCosmosDb : SinkBase<AzureCosmosDbOptions>
     {
+        private string _metricsName = String.Empty;
         private DocumentClient _client;
         private IBulkExecutor _bulkExecutor;
         private List<string> _bulkDocumentsList;
         private AzureCosmosDbOptions _options;
         private TelemetryClient _telemetryClient;
         private event EventHandler _bulkDocumentListFull;
+        private long _totalPayloadCount;
 
         public AzureCosmosDb(string providerName, AzureCosmosDbOptions options, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
-            : base(providerName, options, logger, token)
+            : base(providerName, options, telemetryClient, logger, token)
         {
             _options = options;
             _telemetryClient = telemetryClient;
             _bulkDocumentsList = new List<string>();
 
+            _metricsName = $"{ProviderName}-{Options.Type}-{Options.Collection}";
             InitializeClient().Wait();
         }
 
@@ -66,11 +70,12 @@ namespace DSynth.Sink.Sinks
             _bulkDocumentListFull += HandBulkDocumentListFull;
         }
 
-        internal override async Task RunAsync(byte[] payload)
+        internal override async Task RunAsync(PayloadPackage payloadPackage)
         {
             await Task.Run(() =>
            {
-               _bulkDocumentsList.Add(Encoding.UTF8.GetString(payload));
+               _bulkDocumentsList.Add(payloadPackage.PayloadAsString);
+               _totalPayloadCount += payloadPackage.PayloadCount;
 
                if (_bulkDocumentsList.Count >= _options.BatchSize)
                {
@@ -95,17 +100,19 @@ namespace DSynth.Sink.Sinks
             }
             catch (Exception)
             {
+                RecordFailedSend(_metricsName, _bulkDocumentsList.Count, _totalPayloadCount);
                 throw;
             }
             finally
             {
+                _totalPayloadCount = 0;
                 _bulkDocumentsList.Clear();
             }
         }
 
         private void SendMetrics(BulkImportResponse bulkImportResponse)
         {
-            Metric cosmosMetric = _telemetryClient.GetMetric($"{ProviderName}-{_options.Collection}", $"MetricName");
+            Metric cosmosMetric = _telemetryClient.GetMetric(_metricsName, $"MetricName");
             cosmosMetric.TrackValue(bulkImportResponse.BadInputDocuments.Count, "BadInputDocuments");
             cosmosMetric.TrackValue(bulkImportResponse.FailedImports.Count, "FailedImports");
             cosmosMetric.TrackValue(bulkImportResponse.NumberOfDocumentsImported, "NumDocumentsImported");

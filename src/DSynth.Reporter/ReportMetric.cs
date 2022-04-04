@@ -16,14 +16,16 @@ namespace DSynth.Reporter
         public long IdAsTotalSeconds { get; set; }
         public long SizeInBytes { get; set; }
         public long LatencyInMs { get; set; }
+        public long PayloadCount { get; set; }
         private Stopwatch _stopwatch;
 
-        public static ReportMetric StartNew(string providerName, string metricName, long sizeInBytes)
+        public static ReportMetric StartNew(string providerName, string metricName, long sizeInBytes, long payloadCount)
         {
             ReportMetric r = new ReportMetric();
             r.ProviderName = providerName;
             r.MetricName = metricName;
             r.SizeInBytes = sizeInBytes;
+            r.PayloadCount = payloadCount;
             r._stopwatch = Stopwatch.StartNew();
             return r;
         }

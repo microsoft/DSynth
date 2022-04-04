@@ -29,8 +29,8 @@ namespace DSynth.Provider.Providers
         {
             try
             {
-                object payload = ProviderQueue.Dequeue();
-                return PayloadPackage.CreateNew(XmlSerializeToBytes(payload), XmlSerializeToString(payload));
+                object payload = ProviderQueue.Dequeue(out long payloadCount);
+                return PayloadPackage.CreateNew(XmlSerializeToBytes(payload), payloadCount, XmlSerializeToString(payload));
             }
             catch (Exception ex)
             {
