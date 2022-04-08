@@ -60,13 +60,17 @@ namespace DSynth.Sink
                         AzureLogAnalyticsOptions azureLogAnalyticsOptions = AzureLogAnalyticsOptions.ParseAndValidateOptions<AzureLogAnalyticsOptions>(sinkOptions);
                         return new AzureLogAnalytics(providerName, azureLogAnalyticsOptions, telemetryClient, logger, token);
 
-                    default:
-                        ConsoleOptions consoleSinkOptionsDef = ConsoleOptions.ParseAndValidateOptions<ConsoleOptions>(sinkOptions);
-                        return new Sinks.Console(providerName, consoleSinkOptionsDef, telemetryClient, logger, token);
-
                     case SinkType.AzureCustomLogs:
                         AzureCustomLogsOptions azureCustomLogsOptions = AzureCustomLogsOptions.ParseAndValidateOptions<AzureCustomLogsOptions>(sinkOptions);
                         return new AzureCustomLogs(providerName, azureCustomLogsOptions, telemetryClient, logger, token);
+
+                    case SinkType.ApacheGremlin:
+                        ApacheGremlinOptions apacheGremlinOptions = ApacheGremlinOptions.ParseAndValidateOptions<ApacheGremlinOptions>(sinkOptions);
+                        return new ApacheGremlin(providerName, apacheGremlinOptions, telemetryClient, logger, token);
+                    
+                    default:
+                        ConsoleOptions consoleSinkOptionsDef = ConsoleOptions.ParseAndValidateOptions<ConsoleOptions>(sinkOptions);
+                        return new Sinks.Console(providerName, consoleSinkOptionsDef, telemetryClient, logger, token);
                 }
             }
             catch (Exception ex)
