@@ -43,6 +43,9 @@ namespace DSynth.Provider
                     case ProviderType.JSONL:
                         return new JsonlProvider(providerOptions, logger, token);
 
+                    case ProviderType.Gremlin:
+                        return new GremlinProvider(providerOptions, logger, token);
+
                     default:
                         return null;
                 }

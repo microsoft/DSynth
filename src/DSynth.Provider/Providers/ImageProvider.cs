@@ -29,7 +29,7 @@ namespace DSynth.Provider.Providers
             {
                 _imageStructure = (ImageStructure)ProviderQueue.Dequeue(out long payloadCount);
 
-                return PayloadPackage.CreateNew(_imageStructure.ImageBytes, payloadCount, null, overrides =>
+                return PayloadPackage.CreateNew(_imageStructure.ImageBytes, payloadCount, null, null, overrides =>
                 {
                     overrides.Add("FileNameSuffix", $".{_imageStructure.ImageFormat}");
                 });

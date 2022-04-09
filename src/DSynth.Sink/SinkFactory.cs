@@ -67,6 +67,10 @@ namespace DSynth.Sink
                     case SinkType.ApacheGremlin:
                         ApacheGremlinOptions apacheGremlinOptions = ApacheGremlinOptions.ParseAndValidateOptions<ApacheGremlinOptions>(sinkOptions);
                         return new ApacheGremlin(providerName, apacheGremlinOptions, telemetryClient, logger, token);
+
+                    case SinkType.AzureCosmosDbGraph:
+                        AzureCosmosDbGraphOptions azureCosmosDbGraphOptions = AzureCosmosDbGraphOptions.ParseAndValidateOptions<AzureCosmosDbGraphOptions>(sinkOptions);
+                        return new AzureCosmosDbGraph(providerName, azureCosmosDbGraphOptions, telemetryClient, logger, token);
                     
                     default:
                         ConsoleOptions consoleSinkOptionsDef = ConsoleOptions.ParseAndValidateOptions<ConsoleOptions>(sinkOptions);

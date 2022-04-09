@@ -12,6 +12,7 @@ namespace DSynth.Engine
         CSV,
         Image,
         Raw,
-        JSONL
+        JSONL,
+        Gremlin
     }
 }

@@ -63,7 +63,7 @@ namespace DSynth.Provider.Providers
                     }
                 }
 
-                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(_payloadStringBuilder.ToString()), payloadCount, _payloadStringBuilder.ToString(), overrides =>
+                return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(_payloadStringBuilder.ToString()), payloadCount, _payloadStringBuilder.ToString(), null, overrides =>
                 {
                     overrides.Add("Header", $"{ExtractHeader()}");
                 });

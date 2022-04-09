@@ -41,6 +41,10 @@ namespace DSynth.Engine
                     ret = new JsonlEngine(templateName, callingProviderName, token, logger);
                     break;
 
+                case EngineType.Gremlin:
+                    ret = new GremlinEngine(templateName, callingProviderName, token, logger);
+                    break;
+
                 default:
                     string formattedExMessage = ExceptionUtilities.GetFormattedMessage(
                         Resources.EngineFactory.ExUnableToBuildForType,

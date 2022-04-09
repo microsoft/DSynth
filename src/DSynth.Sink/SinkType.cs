@@ -17,6 +17,7 @@ namespace DSynth.Sink
         AzureCosmosDb,
         AzureLogAnalytics,
         AzureCustomLogs,
-        ApacheGremlin
+        ApacheGremlin,
+        AzureCosmosDbGraph
     }
 }
