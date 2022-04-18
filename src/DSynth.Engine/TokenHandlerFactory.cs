@@ -38,6 +38,9 @@ namespace DSynth.Engine
                 case TokenHandlerType.MacAddress:
                     return new MacAddressHandler(tokenDescriptor, providerName);
 
+                case TokenHandlerType.Coordinate:
+                    return new CoordinateHandler(tokenDescriptor, providerName);
+
                 default:
                     string formattedExMessage = ExceptionUtilities.GetFormattedMessage(
                     Resources.EngineBase.ExUnsupportedType,

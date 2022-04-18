@@ -14,6 +14,7 @@ namespace DSynth.Engine.TokenHandlers
         Guid,
         Nested,
         MacAddress,
-        Timestamp
+        Timestamp,
+        Coordinate
     }
 }

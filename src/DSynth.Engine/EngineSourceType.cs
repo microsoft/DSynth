@@ -18,6 +18,7 @@ namespace DSynth.Engine
         Timestamp,
         Json,
         MacAddress,
-        TrackedLimit
+        TrackedLimit,
+        Polygon
     }
 }

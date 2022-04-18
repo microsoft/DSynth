@@ -200,5 +200,10 @@ namespace DSynth.Engine
         {
             public const int ExpectedParameterCount = 4;
         }
+
+        public static class CoordinateHandler
+        {
+            public const int ExpectedParameterCount = 5;
+        }
     }
 }
