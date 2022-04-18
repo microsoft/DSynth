@@ -193,17 +193,26 @@ namespace DSynth.Engine
         public static class DateTimeHandler
         {
             // Properties
+
             public const int ExpectedParameterCount = 5;
         }
 
         public static class NestedHandler
         {
+            // Properties
+
             public const int ExpectedParameterCount = 4;
         }
 
         public static class CoordinateHandler
         {
-            public const int ExpectedParameterCount = 5;
+            // Properties
+
+            public const int ExpectedParameterCount = 6;
+
+            // Exceptions
+
+            public const string ExInvalidFormat = "Invalid format of type '{0}', available formats are '{1}'";
         }
     }
 }

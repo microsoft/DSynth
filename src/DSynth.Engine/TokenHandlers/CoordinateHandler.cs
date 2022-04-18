@@ -1,5 +1,12 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using DSynth.Common.Utilities;
 using Newtonsoft.Json;
 
 namespace DSynth.Engine.TokenHandlers
@@ -12,6 +19,7 @@ namespace DSynth.Engine.TokenHandlers
         private double _longMax;
         private double _latMin;
         private double _latMax;
+        private Format _format;
 
         public CoordinateHandler(TokenDescriptor tokenDescriptor, string providerName)
             : base(tokenDescriptor, providerName, null)
@@ -34,8 +42,21 @@ namespace DSynth.Engine.TokenHandlers
             List<double> ne = new List<double>() { se[0], GetNextRandomCoord(se[1], double.MaxValue, Direction.Lat, Position.NE) };
             List<double> nw = new List<double>() { sw[0], ne[1] };
             var coordinates = new List<List<double>> { sw, se, ne, nw, sw };
-            
-            return JsonConvert.SerializeObject(coordinates);
+
+            return GetFormattedReturn(coordinates);
+        }
+
+        private string GetFormattedReturn(List<List<double>> coordinates)
+        {
+            switch (_format)
+            {
+                case Format.GeoJson:
+                    return JsonConvert.SerializeObject(coordinates);
+                case Format.String:
+                    return String.Join(",", coordinates.Select(x => String.Join(",", x)));
+                default:
+                    return String.Empty;
+            }
         }
 
         private double GetNextRandomCoord(double min, double max, Direction direction, Position position)
@@ -102,6 +123,17 @@ namespace DSynth.Engine.TokenHandlers
             {
                 ThrowParameterException(precision);
             }
+
+            string format = tokenDescriptor.TokenParameters[5];
+            try
+            {
+                _format = EnumUtilities.GetEnumValueFromString<Format>(tokenDescriptor.TokenParameters[5]);
+            }
+            catch (Exception)
+            {
+                var formattedExMessage = ExceptionUtilities.GetFormattedMessage(Resources.CoordinateHandler.ExInvalidFormat, format, EnumUtilities.GetAllTypesAsCSVString<Format>());
+                ThrowParameterException(formattedExMessage);
+            }
         }
     }
 
@@ -117,5 +149,11 @@ namespace DSynth.Engine.TokenHandlers
         SW,
         NE,
         NW
+    }
+
+    internal enum Format
+    {
+        GeoJson,
+        String
     }
 }
