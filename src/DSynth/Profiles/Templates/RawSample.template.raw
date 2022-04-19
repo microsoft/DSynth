@@ -27,3 +27,4 @@ At this current timestamp '{{Timestamp:DateTime:UTCISO8601}}' the following samp
     numberIncrementReference:                   {{Number:Reference:numberIncTrackedKey}}
     numberDecrementTracked:                     {{Number:DecrementTracked:20..1:1..3:100:numberDecTrackedKey}}
     numberDecrementReference:                   {{Number:Reference:numberDecTrackedKey}}
+    coordinates:                                {{Coordinate:Polygon:[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0]]:0.0075:string}}

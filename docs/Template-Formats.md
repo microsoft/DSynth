@@ -23,14 +23,14 @@ to specify one and not required to leverage a token for every value.
 Sample Template:
 
 ```
-::Header="stringValue","numberValue","boolValue","guid","macAddress","timestampUnixMs","timestampIso8601","timestampIso8601Tracked","timestampIso8601Reference","timestampUnixMsTracked","timestampUnixMsReference","dateTimeRangeIso8601","dateTimeRangeUnixTimeInMs","jsonCollection","jsonCollectionTracked","jsonCollectionReference","csvCollection","csvCollectionTracked","csvCollectionReferenceSameFieldInRow","csvCollectionReferenceAnotherFieldInRow","numberWithNoPrecision","numberWithFivePrecision","numberIncrementTracked","numberIncrementReference","numberDecrementTracked","numberDecrementReference"
-"sample static string", "100", "true", "{{Guid:NewGuid}}", "{{MacAddress:MacAddress}}", "{{Timestamp:DateTime:UnixTimeInMs}}", "{{Timestamp:DateTime:UTCISO8601}}", "{{Timestamp:Tracked:UTCISO8601:iso8601TrackedKey}}", "{{Timestamp:Reference:iso8601TrackedKey}}", "{{Timestamp:Tracked:UnixTimeInMs:unixMsTrackedKey}}", "{{Timestamp:reference:unixMsTrackedKey}}", "{{DateTime:Range:UTCISO8601:Years:1..5}}", "{{DateTime:Range:UnixTimeInMs:Years:1..5}}", "{{JsonCollection:Collection:Sample:sampleLocationNames}}", "{{JsonCollection:Tracked:Sample:sampleLocationNames:jsonTrackedKey}}", "{{JsonCollection:Reference:jsonTrackedKey}}", "{{CsvCollection:Collection:Sample:Model}}", "{{CsvCollection:Tracked:Sample:Model:csvTrackedKey}}", "{{CsvCollection:Reference:Model:csvTrackedKey}}", "{{CsvCollection:Reference:Color:csvTrackedKey}}", "{{number:Range:0..100:0}}", "{{number:Range:0..100:5}}", "{{number:IncrementTracked:1.0..2.0:0.1..0.3:100:numberIncTrackedKey}}", "{{number:Reference:numberIncTrackedKey}}", "{{Number:DecrementTracked:20..1:1..3:100:numberDecTrackedKey}}", "{{number:Reference:numberDecTrackedKey}}"
+::Header="stringValue","numberValue","boolValue","guid","macAddress","timestampUnixMs","timestampIso8601","timestampIso8601Tracked","timestampIso8601Reference","timestampUnixMsTracked","timestampUnixMsReference","dateTimeRangeIso8601","dateTimeRangeUnixTimeInMs","jsonCollection","jsonCollectionTracked","jsonCollectionReference","csvCollection","csvCollectionTracked","csvCollectionReferenceSameFieldInRow","csvCollectionReferenceAnotherFieldInRow","numberWithNoPrecision","numberWithFivePrecision","numberIncrementTracked","numberIncrementReference","numberDecrementTracked","numberDecrementReference","coordinates"
+"sample static string", "100", "true", "{{Guid:NewGuid}}", "{{MacAddress:MacAddress}}", "{{Timestamp:DateTime:UnixTimeInMs}}", "{{Timestamp:DateTime:UTCISO8601}}", "{{Timestamp:Tracked:UTCISO8601:iso8601TrackedKey}}", "{{Timestamp:Reference:iso8601TrackedKey}}", "{{Timestamp:Tracked:UnixTimeInMs:unixMsTrackedKey}}", "{{Timestamp:reference:unixMsTrackedKey}}", "{{DateTime:Range:UTCISO8601:Years:1..5}}", "{{DateTime:Range:UnixTimeInMs:Years:1..5}}", "{{JsonCollection:Collection:Sample:sampleLocationNames}}", "{{JsonCollection:Tracked:Sample:sampleLocationNames:jsonTrackedKey}}", "{{JsonCollection:Reference:jsonTrackedKey}}", "{{CsvCollection:Collection:Sample:Model}}", "{{CsvCollection:Tracked:Sample:Model:csvTrackedKey}}", "{{CsvCollection:Reference:Model:csvTrackedKey}}", "{{CsvCollection:Reference:Color:csvTrackedKey}}", "{{number:Range:0..100:0}}", "{{number:Range:0..100:5}}", "{{number:IncrementTracked:1.0..2.0:0.1..0.3:100:numberIncTrackedKey}}", "{{number:Reference:numberIncTrackedKey}}", "{{Number:DecrementTracked:20..1:1..3:100:numberDecTrackedKey}}", "{{number:Reference:numberDecTrackedKey}}","{{Coordinate:Polygon:[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0]]:0.0075:string}}"
 ```
 
 Output:
 ```csv
 "stringValue","numberValue","boolValue","guid","macAddress","timestampUnixMs","timestampIso8601","timestampIso8601Tracked","timestampIso8601Reference","timestampUnixMsTracked","timestampUnixMsReference","dateTimeRangeIso8601","dateTimeRangeUnixTimeInMs","jsonCollection","jsonCollectionTracked","jsonCollectionReference","csvCollection","csvCollectionTracked","csvCollectionReferenceSameFieldInRow","csvCollectionReferenceAnotherFieldInRow","numberWithNoPrecision","numberWithFivePrecision","numberIncrementTracked","numberIncrementReference","numberDecrementTracked","numberDecrementReference"
-"sample static string", "100", "true", "bb341b42-ff06-4d32-b687-294f1fe27bfc", "6F:8C:CC:88:63:F0", "1628106858378", "2021-08-04T19:54:18.3789050Z", "2021-08-04T19:54:18.3789300Z", "2021-08-04T19:54:18.3789300Z", "1628106858378", "1628106858378", "2023-08-04T19:54:18.3790040Z", "1659642858379", "Washington State", "Washington DC", "Washington DC", "Ford", "Honda", "Honda", "Green", "96", "68.80184", "1.2030234784367604", "1.2030234784367604", "18", "18"
+"sample static string", "100", "true", "bb341b42-ff06-4d32-b687-294f1fe27bfc", "6F:8C:CC:88:63:F0", "1628106858378", "2021-08-04T19:54:18.3789050Z", "2021-08-04T19:54:18.3789300Z", "2021-08-04T19:54:18.3789300Z", "1628106858378", "1628106858378", "2023-08-04T19:54:18.3790040Z", "1659642858379", "Washington State", "Washington DC", "Washington DC", "Ford", "Honda", "Honda", "Green", "96", "68.80184", "1.2030234784367604", "1.2030234784367604", "18", "18", "100.8464,0.8417,100.8537,0.8417,100.8537,0.8456,100.8464,0.8456,100.8464,0.8417"
 ```
 
 ---
@@ -109,7 +109,10 @@ Sample Template:
     [
       {{Nested:Json:JsonSampleNested.template.json:1..3}}
     ]
-  }
+  },
+  "coordinates": [
+    {{Coordinate:Polygon:[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0]]:0.0075:geojson}}
+  ]
 }
 ```
 
@@ -164,7 +167,8 @@ Output:
         "nestedCollectionExample": "Washington DC"
       }
     ]
-  }
+  },
+  "coordinates": [[100.6707,0.0789],[100.6758,0.0789],[100.6758,0.0824],[100.6707,0.0824],[100.6707,0.0789]]
 }
 ```
 
@@ -227,6 +231,9 @@ Sample Template:
         <NumberDecrementTracked>{{Number:DecrementTracked:2.0..1.0:0.1..0.3:100:numberDecTrackedKey}}</NumberDecrementTracked>
         <NumberDecrementReference>{{Number:Reference:numberDecTrackedKey}}</NumberDecrementReference>
     </DoubleExamples>
+    <coordinates>
+        {{Coordinate:Polygon:[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0]]:0.0075:string}}
+    </coordinates>
 </Template>
 ```
 
@@ -288,6 +295,11 @@ Output:
       <NumberDecrementReference>1.7647642785984856</NumberDecrementReference>
     </DoubleExamples>
   </XmlNode>
+  <XmlNode>
+    <coordinates>
+        100.3489,0.528,100.356,0.528,100.356,0.5312,100.3489,0.5312,100.3489,0.528
+    </coordinates>
+  </XmlNode>
 </ArrayOfXmlNode>
 ```
 
@@ -325,6 +337,7 @@ At this current timestamp '{{Timestamp:DateTime:UTCISO8601}}' the following samp
     numberIncrementReference:                   {{Number:Reference:numberIncTrackedKey}}
     numberDecrementTracked:                     {{Number:DecrementTracked:20..1:1..3:100:numberDecTrackedKey}}
     numberDecrementReference:                   {{Number:Reference:numberDecTrackedKey}}
+    coordinates:                                {{Coordinate:Polygon:[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0]]:0.0075:string}}
 ```
 
 Output:
@@ -357,5 +370,6 @@ At this current timestamp '2021-08-04T19:56:15.3526850Z' the following sample re
     numberIncrementReference:                   1.1898660024115193
     numberDecrementTracked:                     19
     numberDecrementReference:                   19
+    coordinates:                                100.8094,0.158,100.8096,0.158,100.8096,0.165,100.8094,0.165,100.8094,0.158
 ```
 

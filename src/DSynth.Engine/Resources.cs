@@ -208,7 +208,7 @@ namespace DSynth.Engine
         {
             // Properties
 
-            public const int ExpectedParameterCount = 6;
+            public const int ExpectedParameterCount = 5;
 
             // Exceptions
 

@@ -117,17 +117,18 @@ namespace DSynth.Engine.TokenHandlers
             {
                 ThrowParameterException(size);
             }
-
-            string precision = tokenDescriptor.TokenParameters[4];
-            if (!int.TryParse(precision, out _precision))
+            else
             {
-                ThrowParameterException(precision);
+                // We will determine precision based on the precision of the size parameter.
+                // If size is a whole number, we set precision to 0.
+                string[] precision = size.Split(".");
+                _precision = precision.Length > 1 ? _precision = precision[1].Length : 0;
             }
 
-            string format = tokenDescriptor.TokenParameters[5];
+            string format = tokenDescriptor.TokenParameters[4];
             try
             {
-                _format = EnumUtilities.GetEnumValueFromString<Format>(tokenDescriptor.TokenParameters[5]);
+                _format = EnumUtilities.GetEnumValueFromString<Format>(tokenDescriptor.TokenParameters[4]);
             }
             catch (Exception)
             {
