@@ -37,10 +37,41 @@ namespace DSynth.Engine.TokenHandlers
 
         public override string GetReplacementValue()
         {
+            string ret = String.Empty;
+
+            switch (SourceType)
+            {
+                case EngineSourceType.Polygon:
+                    ret = GetPolygon();
+                    break;
+                default:
+                    ThrowEngineSourceTypeNotSupportedForHandler();
+                    break;
+            }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Logic used to generate a polygon. We generate the Polygon based on
+        /// the random SW coordinates and from there we draw a square counter
+        /// clockwise from the SW coordinate based on the _size value.
+        /// </summary>
+        public string GetPolygon()
+        {
             List<double> sw = new List<double>() { GetNextRandomCoord(_longMin, _longMax, Direction.Long, Position.SW), GetNextRandomCoord(_latMin, _latMax, Direction.Lat, Position.SW) };
-            List<double> se = new List<double>() { GetNextRandomCoord(sw[0], double.MaxValue, Direction.Long, Position.SE), sw[1] };
-            List<double> ne = new List<double>() { se[0], GetNextRandomCoord(se[1], double.MaxValue, Direction.Lat, Position.NE) };
-            List<double> nw = new List<double>() { sw[0], ne[1] };
+
+            var swLong = sw[0];
+            var swLat = sw[1];
+            List<double> se = new List<double>() { GetNextRandomCoord(swLong, (swLong + _size), Direction.Long, Position.SE), swLat };
+
+            var seLong = se[0];
+            var seLat = se[1];
+            List<double> ne = new List<double>() { seLong, GetNextRandomCoord(seLat, (seLat + _size), Direction.Lat, Position.NE) };
+            
+            var neLat = ne[1];
+            List<double> nw = new List<double>() { swLong, neLat };
+            
             var coordinates = new List<List<double>> { sw, se, ne, nw, sw };
 
             return GetFormattedReturn(coordinates);
@@ -61,31 +92,16 @@ namespace DSynth.Engine.TokenHandlers
 
         private double GetNextRandomCoord(double min, double max, Direction direction, Position position)
         {
-            double ret = double.MinValue;
+            double ret = default;
 
-            if (max == double.MaxValue)
+            if (direction == Direction.Long && max > _longMax)
             {
-                max = min + _size;
-
-                if (direction == Direction.Long && max > _longMax)
-                {
-                    max = _longMax;
-                }
-
-                if (direction == Direction.Lat && max > _latMax)
-                {
-                    max = _latMax;
-                }
+                max = _longMax;
             }
 
-            if (min == double.MinValue)
+            if (direction == Direction.Lat && max > _latMax)
             {
-                min = max - _size;
-
-                if (direction == Direction.Lat && min > _latMax)
-                {
-                    min = _latMax;
-                }
+                max = _latMax;
             }
 
             ret = Math.Round(TokenHandlerHelpers.GetNextRandomDouble(min, max), _precision);
