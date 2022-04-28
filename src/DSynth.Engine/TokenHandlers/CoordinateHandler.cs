@@ -59,15 +59,15 @@ namespace DSynth.Engine.TokenHandlers
         /// </summary>
         public string GetPolygon()
         {
-            List<double> sw = new List<double>() { GetNextRandomCoord(_longMin, _longMax, Direction.Long, Position.SW), GetNextRandomCoord(_latMin, _latMax, Direction.Lat, Position.SW) };
+            List<double> sw = new List<double>() { GetNextRandomCoord(_longMin, _longMax, Direction.Long), GetNextRandomCoord(_latMin, _latMax, Direction.Lat) };
 
             var swLong = sw[0];
             var swLat = sw[1];
-            List<double> se = new List<double>() { GetNextRandomCoord(swLong, (swLong + _size), Direction.Long, Position.SE), swLat };
+            List<double> se = new List<double>() { GetNextRandomCoord(swLong, (swLong + _size), Direction.Long), swLat };
 
             var seLong = se[0];
             var seLat = se[1];
-            List<double> ne = new List<double>() { seLong, GetNextRandomCoord(seLat, (seLat + _size), Direction.Lat, Position.NE) };
+            List<double> ne = new List<double>() { seLong, GetNextRandomCoord(seLat, (seLat + _size), Direction.Lat) };
             
             var neLat = ne[1];
             List<double> nw = new List<double>() { swLong, neLat };
@@ -90,9 +90,9 @@ namespace DSynth.Engine.TokenHandlers
             }
         }
 
-        private double GetNextRandomCoord(double min, double max, Direction direction, Position position)
+        private double GetNextRandomCoord(double min, double max, Direction direction)
         {
-            double ret = default;
+            double ret;
 
             if (direction == Direction.Long && max > _longMax)
             {
@@ -158,14 +158,6 @@ namespace DSynth.Engine.TokenHandlers
     {
         Long,
         Lat
-    }
-
-    internal enum Position
-    {
-        SE,
-        SW,
-        NE,
-        NW
     }
 
     internal enum Format
