@@ -1,4 +1,4 @@
-# Template Tokens
+a# Template Tokens
 Template tokens are used to specify what values get replace inside of each template and have the following base format `{{TokenHandlerType:Source}}`. The tokens called out in the template files will be replaced with data from the `Source` with the returned (`ReplacementValue`) value. Some tokens will have additional parameters - more below.
 
 # Supported Tokens
@@ -46,6 +46,13 @@ Gets substituted with a number int or double.
 |Number|IncrementTracked|Number value specifying start and end, i.e. `1.0..2.0` or `1..10`|The range that the value will deviate, i.e. `0.001..0.003` or `1..3`|How often the value will deviate, i.e. `1` will be 1% of the time. Setting this to `1` will deviate 100% of the time.|{{Number:IncrementTracked:1.0..2.0:0.1..0.3:0.1:trackedKeyName}}|
 |Number|DecrementTracked|Number value specifying start and end, i.e. `1.0..2.0` or `1..10`|The range that the value will deviate, i.e. `0.001..0.003` or `1..3`|How often the value will deviate, i.e. `1` will be 1% of the time. Setting this to `1` will deviate 100% of the time.|{{Number:DecrementTracked:2.0..1.0:0.1..0.3:0.1:trackedKeyName}}|
 |Number|Reference|N/A|N/A|N/A|{{Number:Reference:trackedKeyName}}
+
+## Coordinates
+Gets a set of coordinates in (Latitude, Longitude)
+
+|TokenHandlerType|Source|ReplacementValue|BoundingBox|Size|Format|Token|
+|--|--|--|--|--|--|--|
+|Coordinate|Poylgon|A random set of Longitude/Latitude coordinates that defines a square area within a bounding area|Bounding box input as JSON array of [Longitude, Latitude], i.e.,  [[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0]]|A double value that will set the size of the feature, i.e., 0.0075 the more precision, the smaller the feature.|geojson \| string|{{Coordinate:Polygon:[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0]]:0.0075:geojson}}|
 
 ## JsonCollection
 Gets substituted with a random value defined in a [Template Collection](./Template-Collections.md) file. For example, if I have a template collections file named `Sample.collections.json` and have a ReplacementValue of `sampleLocationNames`, `{{JsonCollection:Collection:Sample:sampleLocationNames}}`, DSynth will look for an array named `sampleLocationNames` in `Sample.collections.json` and select a random element from the array.

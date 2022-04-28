@@ -51,5 +51,8 @@
     [
       {{Nested:Json:JsonSampleNested.template.json:1..3}}
     ]
-  }
+  },
+  "coordinates": [
+    {{Coordinate:Polygon:[[100.0,0.0],[101.0,0.0],[101.0,1.0],[100.0,1.0]]:0.0075:geojson}}
+  ]
 }
