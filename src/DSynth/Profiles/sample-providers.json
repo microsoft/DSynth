@@ -14,7 +14,10 @@
       "intervalInMs": 10000,
       "templateName": "JsonSample.template.json",
       "minBatchSize": 1,
-      "maxBatchSize": 0
+      "maxBatchSize": 0,
+      "advancedOptions": {
+        "targetQueueSize": 10
+      }
     },
     {
       "isPushEnabled": true,
@@ -30,7 +33,10 @@
       "intervalInMs": 10000,
       "templateName": "XmlSample.template.xml",
       "minBatchSize": 1,
-      "maxBatchSize": 0
+      "maxBatchSize": 0,
+      "advancedOptions": {
+        "targetQueueSize": 10
+      }
     },
     {
       "isPushEnabled": true,
@@ -46,7 +52,10 @@
       "intervalInMs": 10000,
       "templateName": "CsvSample.template.csv",
       "minBatchSize": 1,
-      "maxBatchSize": 0
+      "maxBatchSize": 0,
+      "advancedOptions": {
+        "targetQueueSize": 10
+      }
     },
     {
       "isPushEnabled": true,
@@ -62,7 +71,10 @@
       "intervalInMs": 10000,
       "templateName": "RawSample.template.raw",
       "minBatchSize": 1,
-      "maxBatchSize": 0
+      "maxBatchSize": 0,
+      "advancedOptions": {
+        "targetQueueSize": 10
+      }
     },
     {
       "isPushEnabled": false,
@@ -78,7 +90,10 @@
         }
       ],
       "intervalInMs": 10000,
-      "templateName": "ImageSample.template.image"
+      "templateName": "ImageSample.template.image",
+      "advancedOptions": {
+        "targetQueueSize": 10
+      }
     }
   ]
 }
