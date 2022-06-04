@@ -43,6 +43,9 @@ namespace DSynth.Provider
                     case ProviderType.JSONL:
                         return new JsonlProvider(providerOptions, logger, token);
 
+                    case ProviderType.Parquet:
+                        return new ParquetProvider(providerOptions, logger, token);
+
                     default:
                         return null;
                 }
