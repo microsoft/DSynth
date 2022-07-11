@@ -88,6 +88,10 @@ namespace DSynth.Sink.Sinks
                     await _lazyClient.Value.CreateIfNotExistsAsync().ConfigureAwait(false);
                     Logger.LogInformation(_infoBlobContainerCreated, Options.BlobContainerName);
                 }
+                else
+                {
+                    throw;
+                }
             }
         }
     }
