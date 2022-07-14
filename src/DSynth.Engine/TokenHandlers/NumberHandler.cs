@@ -83,15 +83,13 @@ namespace DSynth.Engine.TokenHandlers
             double ret = 0.0;
             if (_trackedDict.TryGetValue(_formattedTrackedKey, out double lastValue))
             {
-                if (lastValue >= _endAt)
-                    return _endAt;
-
                 if (!TokenHandlerHelpers.ShouldDeviate(_replacementWeight))
                     return lastValue;
 
                 double nextIncrement = TokenHandlerHelpers.GetNextRandomNumber(_minRange, _maxRange);
                 ret = lastValue += nextIncrement;
                 ret = ret >= _endAt ? _endAt : ret;
+                ret = ret <= _startAt ? _startAt : ret;
                 _trackedDict[_formattedTrackedKey] = ret;
             }
             else
