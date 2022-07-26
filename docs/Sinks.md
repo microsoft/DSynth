@@ -208,7 +208,7 @@ Provides functionality to write to Azure Service Bus
 ```json
 "sinks": [
   {
-    "type": "AzureEventHub",
+    "type": "AzureServiceBus",
     "connectionString": "{CONECTIONSTRING}",
     "maxSizeInBytes": "131072",
     "topicOrQueueName": "mytopic"
@@ -219,8 +219,8 @@ Provides functionality to write to Azure Service Bus
 ### Parameters
 |Parameter Name|Available Values|Description|
 |--|--|--|
-|type|AzureEventHub|Specifies the sink type of AzureEventHub|
-|connectionString|String value|Connection string for the desired Event Hub where payloads get written to. Supports retrieving secret from environment variable using `env:MY_ENV_VAR_NAME` as the connectionString value.|
+|type|AzureServiceBus|Specifies the sink type of AzureServiceBus|
+|connectionString|String value|Connection string for the desired Service Bus where payloads get written to. Supports retrieving secret from environment variable using `env:MY_ENV_VAR_NAME` as the connectionString value.|
 |maxSizeInBytes|Long? value|Provides max byte size for batching messages. If null, the maximum size allowed by the transport is used.|
 |topicOrQueueName|String value|Topic or queue name where messages get sent|
 
