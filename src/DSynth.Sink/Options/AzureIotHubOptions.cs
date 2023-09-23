@@ -3,8 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
@@ -12,11 +10,14 @@ namespace DSynth.Sink.Options
 {
     public class AzureIotHubOptions : SinkOptionsBase, IValidatableObject
     {
-        [JsonProperty("deviceConnectionString")]
-        private string _deviceConnectionString { get; set; }
+        [JsonProperty("sharedAccessKey")]
+        private string _sharedAccessKey { get; set; }
 
         [JsonIgnore]
-        public string DeviceConnectionString => EvaluateAndRetrieveValue(_deviceConnectionString);
+        public string SharedAccessKey => EvaluateAndRetrieveValue(_sharedAccessKey);
+
+        [JsonProperty("hostName")]
+        public string HostName { get; set; } = "Undefined";
 
         [JsonProperty("deviceId")]
         public string DeviceId { get; set; } = "Undefined";

@@ -27,12 +27,13 @@ namespace DSynth.Sink.Sinks
         private long _trackedBatchSizeBytes;
         private long _totalPayloadCount;
         private static object _lockObject = new object();
-        private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public AzureIotHub(string providerName, AzureIotHubOptions sinkOptions, TelemetryClient telemetryClient, ILogger logger, CancellationToken token)
             : base(providerName, sinkOptions, telemetryClient, logger, token)
         {
-            _client = DeviceClient.CreateFromConnectionString(Options.DeviceConnectionString, TransportType.Amqp_Tcp_Only);
+            var deviceConnectionString = $"HostName={Options.HostName};DeviceId={Options.DeviceId};SharedAccessKey={Options.SharedAccessKey}";
+            _client = DeviceClient.CreateFromConnectionString(deviceConnectionString, TransportType.Amqp_Tcp_Only);
             _iotHubMessages = new List<Message>();
             _queueFlushTimer = new System.Timers.Timer(Options.BatchFlushIntervalMiliSec);
             DetermineSendStrategy();
@@ -71,7 +72,7 @@ namespace DSynth.Sink.Sinks
 
             // When we specify either batch size or batch interval, we will process as batch.
 
-            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
+            // await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
             await Task.Run(() =>
             {
                 if (!TryAdd(payloadPackage.PayloadAsBytes))
@@ -85,12 +86,12 @@ namespace DSynth.Sink.Sinks
                 }
             }).ConfigureAwait(false);
 
-            _semaphoreSlim.Release();
+            // _semaphoreSlim.Release();
         }
 
         private bool TryAdd(byte[] messageBytes)
         {
-            // _semaphoreSlim.Wait();
+            _semaphoreSlim.Wait();
             int batchSizeBytesLimit = Options.BatchSizeInBytes;
             int incommingMessageSize = messageBytes.Length;
             if (_trackedBatchSizeBytes + incommingMessageSize >= batchSizeBytesLimit && batchSizeBytesLimit > 0)
@@ -106,7 +107,7 @@ namespace DSynth.Sink.Sinks
             };
             _iotHubMessages.Add(new Message(messageBytes));
 
-            // _semaphoreSlim.Release();
+            _semaphoreSlim.Release();
 
             return true;
         }
