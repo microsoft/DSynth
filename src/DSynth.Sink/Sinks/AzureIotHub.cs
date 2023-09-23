@@ -35,7 +35,6 @@ namespace DSynth.Sink.Sinks
             var deviceConnectionString = $"HostName={Options.HostName};DeviceId={Options.DeviceId};SharedAccessKey={Options.SharedAccessKey}";
             _client = DeviceClient.CreateFromConnectionString(deviceConnectionString, TransportType.Amqp_Tcp_Only);
             _iotHubMessages = new List<Message>();
-            _queueFlushTimer = new System.Timers.Timer(Options.BatchFlushIntervalMiliSec);
             DetermineSendStrategy();
             _metricsName = $"{ProviderName}-{Options.Type}-{Options.DeviceId}";
         }
@@ -48,14 +47,15 @@ namespace DSynth.Sink.Sinks
                 return;
             }
 
-            if (Options.BatchFlushIntervalMiliSec >= 0)
+            if (Options.BatchFlushIntervalMiliSec > 0)
             {
+                _queueFlushTimer = new System.Timers.Timer(Options.BatchFlushIntervalMiliSec);
                 _queueFlushTimer.Elapsed += HandleMessageBatchFull;
                 _queueFlushTimer.Enabled = true;
                 _queueFlushTimer.Start();
             }
 
-            if (Options.BatchSizeInBytes >= 0)
+            if (Options.BatchSizeInBytes > 0)
             {
                 _messageBatchFull += HandleMessageBatchFull;
             }
@@ -92,6 +92,7 @@ namespace DSynth.Sink.Sinks
             int incommingMessageSize = messageBytes.Length;
             if (_trackedBatchSizeBytes + incommingMessageSize >= batchSizeBytesLimit && batchSizeBytesLimit > 0)
             {
+                _semaphoreSlim.Release();
                 return false;
             }
 
@@ -134,6 +135,7 @@ namespace DSynth.Sink.Sinks
             finally
             {
                 _totalPayloadCount = 0;
+                _trackedBatchSizeBytes = 0;
                 _iotHubMessages.Clear();
                 _semaphoreSlim.Release();
             }
