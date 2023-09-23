@@ -71,8 +71,6 @@ namespace DSynth.Sink.Sinks
             }
 
             // When we specify either batch size or batch interval, we will process as batch.
-
-            // await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
             await Task.Run(() =>
             {
                 if (!TryAdd(payloadPackage.PayloadAsBytes))
@@ -85,8 +83,6 @@ namespace DSynth.Sink.Sinks
                     _totalPayloadCount += payloadPackage.PayloadCount;
                 }
             }).ConfigureAwait(false);
-
-            // _semaphoreSlim.Release();
         }
 
         private bool TryAdd(byte[] messageBytes)
@@ -120,13 +116,9 @@ namespace DSynth.Sink.Sinks
         private void HandleMessageBatchFull(object sender, EventArgs e)
         {
             _semaphoreSlim.Wait();
-            // lock (_lockObject)
-            // {
-            // StopIntervalTimer();
-
             if (!_iotHubMessages.Any())
             {
-                // StartIntervalTimer();
+                _semaphoreSlim.Release();
                 return;
             }
 
@@ -143,10 +135,8 @@ namespace DSynth.Sink.Sinks
             {
                 _totalPayloadCount = 0;
                 _iotHubMessages.Clear();
-                // StartIntervalTimer();
+                _semaphoreSlim.Release();
             }
-            _semaphoreSlim.Release();
-            // }
         }
 
         private void StopIntervalTimer()
