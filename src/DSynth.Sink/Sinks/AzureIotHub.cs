@@ -43,7 +43,6 @@ namespace DSynth.Sink.Sinks
         {
             if (Options.BatchFlushIntervalMiliSec <= 0 && Options.BatchSizeInBytes <= 0)
             {
-                _queueFlushTimer.Enabled = false;
                 return;
             }
 
