@@ -21,7 +21,7 @@ namespace DSynth.Reporter
         private ConcurrentDictionary<long, ReportMetricAggregate> _aggReportMetricDict;
         private ConcurrentQueue<ReportMetric> _indvReportMetricsQueue;
         private string _providerName;
-        private int _sampleWindowInSeconds;
+        private long _sampleWindowInSeconds;
         private CancellationToken _token;
         private ILogger _logger;
 
@@ -29,7 +29,7 @@ namespace DSynth.Reporter
             ConcurrentDictionary<long, ReportMetricAggregate> aggReportMetricDict,
             ConcurrentQueue<ReportMetric> indvReportMetricsQueue,
             string providerName,
-            int sampleWindowInSeconds,
+            long sampleWindowInSeconds,
             CancellationToken token,
             ILogger logger)
         {

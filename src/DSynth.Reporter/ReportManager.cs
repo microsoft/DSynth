@@ -28,7 +28,7 @@ namespace DSynth.Reporter
         /// if set to 10, we will take metrics for each given 10 second
         /// window and provide percentiles across that window and ship them.
         /// </summary>
-        private int _sampleWindowInSeconds = 10;
+        private long _sampleWindowInSeconds = 10;
         private long _currentAggBucketSeconds;
         
         public ReportManager(string providerName, CancellationToken token, ILogger logger)
@@ -51,6 +51,12 @@ namespace DSynth.Reporter
         public void AddMetric(ReportMetric metric)
         {
             long currentMetricSeconds = metric.Timestamp.ToUnixTimeSeconds();
+            long secondBucketDelta = currentMetricSeconds - _currentAggBucketSeconds;
+
+            if (secondBucketDelta > _sampleWindowInSeconds)
+            {
+                _sampleWindowInSeconds = secondBucketDelta;
+            }
 
             if (currentMetricSeconds < _currentAggBucketSeconds + _sampleWindowInSeconds)
             {

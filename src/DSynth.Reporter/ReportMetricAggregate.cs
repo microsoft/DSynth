@@ -44,9 +44,9 @@ namespace DSynth.Reporter
         public Dictionary<string, double> RuntimeInMsPercentiles { get; set; }
 
         [JsonProperty("sampleWindowInSeconds")]
-        public int SampleWindowInSeconds { get; set; }
+        public long SampleWindowInSeconds { get; set; }
 
-        public ReportMetricAggregate(ReportMetric metric, int sampleWindowInSeconds)
+        public ReportMetricAggregate(ReportMetric metric, long sampleWindowInSeconds)
         {
             ProviderName = metric.ProviderName;
             MetricName = metric.MetricName;
