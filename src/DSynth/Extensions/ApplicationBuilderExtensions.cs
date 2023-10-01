@@ -25,7 +25,7 @@ namespace DSynth.Extensions
 
             app.UseCors();
             app.UseRouting();
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
