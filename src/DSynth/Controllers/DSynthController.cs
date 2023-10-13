@@ -223,6 +223,8 @@ namespace DSynth.Controllers
         /// Retrieves a payload for a given provider
         /// </summary>
         [HttpGet]
+        [HttpPost]
+        [HttpPatch]
         [Route("Providers/{providerName}/GetNextPayload")]
         public IActionResult ProviderGetNextPayload(string providerName)
         {
