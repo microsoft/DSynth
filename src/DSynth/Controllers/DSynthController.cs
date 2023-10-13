@@ -228,7 +228,14 @@ namespace DSynth.Controllers
         [Route("Providers/{providerName}/GetNextPayload")]
         public IActionResult ProviderGetNextPayload(string providerName)
         {
-            return Ok(_dSynthService.GetNextPayload(providerName).PayloadAsString);
+            Request.Headers.TryGetValue("Accept", out var acceptHeader);
+            if (string.IsNullOrEmpty(acceptHeader))
+            {
+                acceptHeader = "text/plain";
+            }
+
+            var content = Content(_dSynthService.GetNextPayload(providerName).PayloadAsString, acceptHeader);
+            return Ok(content);
         }
     }
 }
