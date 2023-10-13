@@ -13,6 +13,9 @@ using Microsoft.Extensions.Logging;
 using DSynth.Models;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using System.Net;
+using MongoDB.Bson.IO;
+using System.Text.Json;
 
 namespace DSynth.Controllers
 {
@@ -228,14 +231,12 @@ namespace DSynth.Controllers
         [Route("Providers/{providerName}/GetNextPayload")]
         public IActionResult ProviderGetNextPayload(string providerName)
         {
-            Request.Headers.TryGetValue("Accept", out var acceptHeader);
-            if (string.IsNullOrEmpty(acceptHeader))
+            // Remove accept header because the output is determined by the provider
+            if (Request.Headers.TryGetValue(HttpRequestHeader.Accept.ToString(), out var acceptHeader))
             {
-                acceptHeader = "text/plain";
+                Request.Headers.Remove(HttpRequestHeader.Accept.ToString());
             }
-
-            var content = Content(_dSynthService.GetNextPayload(providerName).PayloadAsString, acceptHeader);
-            return Ok(content);
+            return Ok(_dSynthService.GetNextPayload(providerName).PayloadAsString);
         }
     }
 }
