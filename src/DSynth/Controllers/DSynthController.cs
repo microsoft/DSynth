@@ -232,7 +232,7 @@ namespace DSynth.Controllers
         public IActionResult ProviderGetNextPayload(string providerName)
         {
             // Remove accept header because the output is determined by the provider
-            if (Request.Headers.TryGetValue(HttpRequestHeader.Accept.ToString(), out var acceptHeader))
+            if (Request.Headers.TryGetValue(HttpRequestHeader.Accept.ToString(), out _))
             {
                 Request.Headers.Remove(HttpRequestHeader.Accept.ToString());
             }
