@@ -43,6 +43,9 @@ namespace DSynth.Provider
                     case ProviderType.JSONL:
                         return new JsonlProvider(providerOptions, logger, token);
 
+                    case ProviderType.Proto:
+                        return new ProtoProvider(providerOptions, logger, token);
+
                     default:
                         return null;
                 }

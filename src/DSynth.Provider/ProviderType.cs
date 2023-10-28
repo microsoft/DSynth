@@ -12,6 +12,7 @@ namespace DSynth.Provider
         CSV,
         Image,
         Raw,
-        JSONL
+        JSONL,
+        Proto
     }
 }

@@ -364,7 +364,7 @@ src/DSynth/Profiles/Templates/*
 src/DSynth/Profiles/Templates/Collections/*
 !src/DSynth/Profiles/Templates/Collections/Sample.collections.json
 !src/DSynth/Profiles/Templates/Collections/Sample.collections.csv
-
+*.proto
 
 file-sink-output
 
