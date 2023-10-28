@@ -11,16 +11,26 @@ namespace DSynth.Engine.Engines
 {
     public class JsonEngine : EngineBase
     {
+        private static readonly JsonSerializerOptions jsonOptions;
+
+        static JsonEngine()
+        {
+            jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                WriteIndented = false,
+            };
+        }
+
         public JsonEngine(string templateName, string callingProviderName, CancellationToken token, ILogger logger)
             : base(templateName, callingProviderName, token, logger)
         {
-            
         }
 
         public override object BuildPayload()
         {
             string template = GetTemplateWithReplacedTokens();
-            return JsonSerializer.Deserialize<object>(template);
+            return JsonSerializer.Deserialize<object>(template, jsonOptions);
         }
     }
 }
