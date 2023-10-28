@@ -16,6 +16,16 @@ namespace DSynth.Provider.Providers
 {
     public class JsonProvider : ProviderBase
     {
+        private static readonly JsonSerializerOptions jsonOptions;
+
+        static JsonProvider()
+        {
+            jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = false,
+            };
+        }
+
         public override PayloadPackage Package => PreparePayloadPackage();
 
         public JsonProvider(DSynthProviderOptions options, ILogger logger, CancellationToken token)
@@ -27,8 +37,7 @@ namespace DSynth.Provider.Providers
         {
             try
             {
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string stringPayload = JsonSerializer.Serialize(ProviderQueue.Dequeue(out long payloadCount), options);
+                string stringPayload = JsonSerializer.Serialize(ProviderQueue.Dequeue(out long payloadCount), jsonOptions);
                 return PayloadPackage.CreateNew(Encoding.UTF8.GetBytes(stringPayload), payloadCount, stringPayload);
             }
             catch (Exception ex)
