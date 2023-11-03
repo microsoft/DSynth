@@ -236,7 +236,36 @@ namespace DSynth.Controllers
             {
                 Request.Headers.Remove(HttpRequestHeader.Accept.ToString());
             }
+            
+            _logger.LogInformation(new ResponseLog(Request).ToString());
+
             return Ok(_dSynthService.GetNextPayload(providerName).PayloadAsString);
+        }
+    }
+
+    public class ResponseLog
+    {
+        public ResponseLog(HttpRequest request)
+        {
+            byte[] bodyBuffer = new byte[request.ContentLength ?? 0];
+            request.Body.ReadAsync(bodyBuffer, 0, bodyBuffer.Length).GetAwaiter().GetResult();
+
+            this.RequestMethod = request.Method;
+            this.RequestBody = System.Text.Encoding.UTF8.GetString(bodyBuffer);
+            this.RequestHeaders = request.Headers;
+            this.RequestPath = request.Path;
+            this.RequestQueryString = request.QueryString.ToString();
+        }
+
+        public string RequestPath { get; set; }
+        public string RequestQueryString { get; }
+        public string RequestMethod { get; set; }
+        public IHeaderDictionary RequestHeaders { get; set; }
+        public string? RequestBody { get; set; }
+
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
         }
     }
 }
