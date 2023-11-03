@@ -14,8 +14,9 @@ using DSynth.Models;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using System.Net;
-using MongoDB.Bson.IO;
-using System.Text.Json;
+using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 
 namespace DSynth.Controllers
 {
@@ -236,7 +237,7 @@ namespace DSynth.Controllers
             {
                 Request.Headers.Remove(HttpRequestHeader.Accept.ToString());
             }
-            
+
             _logger.LogInformation(new ResponseLog(Request).ToString());
 
             return Ok(_dSynthService.GetNextPayload(providerName).PayloadAsString);
@@ -247,11 +248,16 @@ namespace DSynth.Controllers
     {
         public ResponseLog(HttpRequest request)
         {
-            byte[] bodyBuffer = new byte[request.ContentLength ?? 0];
-            request.Body.ReadAsync(bodyBuffer, 0, bodyBuffer.Length).GetAwaiter().GetResult();
+            // byte[] bodyBuffer = new byte[request.ContentLength ?? 0];
+            // request.Body.ReadAsync(bodyBuffer, 0, bodyBuffer.Length).GetAwaiter().GetResult();
+
+            using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
+            {
+                this.RequestBody = reader.ReadToEndAsync().Result;
+            }
 
             this.RequestMethod = request.Method;
-            this.RequestBody = System.Text.Encoding.UTF8.GetString(bodyBuffer);
+            // this.RequestBody = System.Text.Encoding.UTF8.GetString(bodyBuffer);
             this.RequestHeaders = request.Headers;
             this.RequestPath = request.Path;
             this.RequestQueryString = request.QueryString.ToString();
@@ -265,7 +271,8 @@ namespace DSynth.Controllers
 
         public override string ToString()
         {
-            return JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            // return JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
 }
