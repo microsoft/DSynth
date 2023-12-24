@@ -2,6 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+#nullable enable
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -248,16 +249,12 @@ namespace DSynth.Controllers
     {
         public ResponseLog(HttpRequest request)
         {
-            // byte[] bodyBuffer = new byte[request.ContentLength ?? 0];
-            // request.Body.ReadAsync(bodyBuffer, 0, bodyBuffer.Length).GetAwaiter().GetResult();
-
             using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
             {
                 this.RequestBody = reader.ReadToEndAsync().Result;
             }
 
             this.RequestMethod = request.Method;
-            // this.RequestBody = System.Text.Encoding.UTF8.GetString(bodyBuffer);
             this.RequestHeaders = request.Headers;
             this.RequestPath = request.Path;
             this.RequestQueryString = request.QueryString.ToString();
@@ -271,7 +268,6 @@ namespace DSynth.Controllers
 
         public override string ToString()
         {
-            // return JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }

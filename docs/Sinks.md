@@ -6,7 +6,8 @@ The following documentation will outline how to configure various sinks. DSynth 
 [Azure Blob](#azureblob)</br>
 [Azure Cosmos DB](#azurecosmosdb)</br>
 [Azure Custom Logs](#azurecustomlogs)</br>
-[Azure Event Hub](#azureeventhub)</br>
+[Azure Event Hubs](#azureeventhubs)</br>
+[Azure IoT Hub](#azureiothub)</br>
 [Azure Log Analytics](#azureloganalytics)</br>
 [Azure Service Bus](#azureservicebus)</br>
 [File](#file)</br>
@@ -136,7 +137,7 @@ Provides functionality to write payloads to Azure Custom Logs via Data Connectio
 
 ---
 
-## <a id="azureeventhub"></a>Azure Event Hub
+## <a id="azureeventhubs"></a>Azure Event Hubs
 Provides functionality to write to Azure Event Hubs
 
 ### Structure
@@ -160,6 +161,39 @@ Provides functionality to write to Azure Event Hubs
 |connectionString|String value|Connection string for the desired Event Hub where payloads get written to. Supports retrieving secret from environment variable using `env:MY_ENV_VAR_NAME` as the connectionString value.|
 |eventBatchSizeInBytes|long value|How large the batch size is that gets sent to Event Hubs|
 |operationTimeoutMs (Optional)|Int value|Sets the Event Hub client timeout in milliseconds, **Default 60000**|
+
+---
+
+## <a id="azureiothub"></a>Azure Event IoT Hub
+Provides functionality to write to Azure IoT Hub
+
+### Structure
+```json
+"sinks": [
+  {
+    "type": "AzureIotHub",
+    "sharedAccessKey": "{SHARED_ACCESS_KEY}",
+    "hostName": "{HOST_NAME}",
+    "deviceId": "{DEVICE_ID}",
+    "batchSizeInBytes": 262144,
+    "eventBatchSizeInBytes": 131072,
+    "batchFlushIntervalMiliSec": 30000,
+    "operationTimeoutMs": 60000
+  }
+]
+```
+### Documentation
+[Microsoft.Azure.EventHubs Namespace](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.eventhubs?view=azure-dotnet)
+
+### Parameters
+|Parameter Name|Available Values|Description|
+|--|--|--|
+|type|AzureItoHub|Specifies the sink type of AzureEventHub|
+|sharedAccessKey|String value|Shared access key for the given device. Supports retrieving secret from environment variable using `env:MY_ENV_VAR_NAME` as the sharedAccessKey value.|
+|hostName|String value|Azure IoT Hub host name.|
+|deviceId|String value|The device id that send the events to IoT hub.|
+|batchSizeInBytes|Int value|The size in bytes that will get queued up before sending all events.|
+|BatchFlushIntervalMiliSec|String value|The time to wait until flushing any messages in the queue. Set to 0 if you never want to flush before the batch size is reached.|
 
 ---
 
