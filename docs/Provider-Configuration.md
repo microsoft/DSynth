@@ -76,14 +76,14 @@ These should not need to be touched in most regular use cases. They have default
 
 ## Supported Sink Configurations by Provider Type
 
-|Provider|Azure Blob|Azure Cosmos DB|Azure Event Hubs|Azure Service Bus|File|Console|Http|Socket Server|
-|--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|CSV|<span style="color:green">Yes</span>|<span style="color:orange">No</span>|<span style="color:orange">No</span>|<span style="color:orange">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|
-|Image|<span style="color:green">Yes</span>|<span style="color:orange">No</span>|<span style="color:orange">No</span>|<span style="color:orange">No</span>|<span style="color:green">Yes</span>|<span style="color:orange">No</span>|<span style="color:orange">No</span>|<span style="color:orange">No</span>|
-|JSON|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|
-|JSONL (Json Lines)|<span style="color:green">Yes</span>|<span style="color:orange">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|
-|RAW|<span style="color:green">Yes</span>|<span style="color:orange">No</span>|<span style="color:orange">No</span>|<span style="color:orange">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|
-|XML|<span style="color:green">Yes</span>|<span style="color:orange">No</span>|<span style="color:green">Yes</span>|<span style="color:orange">No</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|<span style="color:green">Yes</span>|
+|Provider|Azure Blob|Azure Cosmos DB|Azure Event Hubs|Azure IoT Hub|Azure Service Bus|File|Console|Http|Socket Server|
+|--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+|CSV|✅|🚫|🚫|✅||🚫|✅|✅|✅|✅|
+|Image|✅|🚫|🚫|🚫|🚫|✅|🚫|🚫|🚫|
+|JSON|✅|✅|✅|✅|✅|✅|✅|✅|✅|
+|JSONL (Json Lines)|✅|🚫|✅|✅|✅|✅|✅|✅|✅|
+|RAW|✅|🚫|✅|✅|✅|✅|✅|✅|✅|
+|XML|✅|🚫|✅|✅|🚫|✅|✅|✅|✅|
 
 ## Special Provider Considerations
 ### Image

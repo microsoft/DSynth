@@ -23,6 +23,7 @@ namespace DSynth.Provider
         private readonly CancellationToken _token;
         private readonly Random _random;
         private BlockingCollection<object> _blockingCollection;
+        private IDSynthEngine _dsynthEngine;
 
         public ProviderQueue(IDSynthEngine dSynthEngine, DSynthProviderOptions options, ILogger logger, CancellationToken token)
         {
@@ -32,10 +33,11 @@ namespace DSynth.Provider
             _random = new Random();
             _payloadCollection = new List<object>();
             _blockingCollection = new BlockingCollection<object>(_options.AdvancedOptions.TargetQueueSize);
+            _dsynthEngine = dSynthEngine;
 
             Parallel.For(0, _options.AdvancedOptions.QueueWorkers, index =>
             {
-                Task.Run(() => PopulateCollectionAsync(dSynthEngine));
+                Task.Run(() => PopulateCollectionAsync(_dsynthEngine));
             });
         }
 
@@ -75,6 +77,11 @@ namespace DSynth.Provider
 
             try
             {
+                if (_options.AdvancedOptions.TargetQueueSize == 1)
+                {
+                    return _dsynthEngine.BuildPayload();
+                }
+                
                 while (!_blockingCollection.TryTake(out ret) && !_token.IsCancellationRequested)
                 {
                     // Slight delay when the blocking collection is empty. We will

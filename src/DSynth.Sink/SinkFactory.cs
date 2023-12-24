@@ -59,14 +59,18 @@ namespace DSynth.Sink
                     case SinkType.AzureLogAnalytics:
                         AzureLogAnalyticsOptions azureLogAnalyticsOptions = AzureLogAnalyticsOptions.ParseAndValidateOptions<AzureLogAnalyticsOptions>(sinkOptions);
                         return new AzureLogAnalytics(providerName, azureLogAnalyticsOptions, telemetryClient, logger, token);
-
-                    default:
-                        ConsoleOptions consoleSinkOptionsDef = ConsoleOptions.ParseAndValidateOptions<ConsoleOptions>(sinkOptions);
-                        return new Sinks.Console(providerName, consoleSinkOptionsDef, telemetryClient, logger, token);
-
+                    
                     case SinkType.AzureCustomLogs:
                         AzureCustomLogsOptions azureCustomLogsOptions = AzureCustomLogsOptions.ParseAndValidateOptions<AzureCustomLogsOptions>(sinkOptions);
                         return new AzureCustomLogs(providerName, azureCustomLogsOptions, telemetryClient, logger, token);
+                    
+                    case SinkType.AzureIotHub:
+                        AzureIotHubOptions azureIotHubOptions = AzureIotHubOptions.ParseAndValidateOptions<AzureIotHubOptions>(sinkOptions);
+                        return new AzureIotHub(providerName, azureIotHubOptions, telemetryClient, logger, token);
+
+                    default:
+                        ConsoleOptions consoleSinkOptionsDef = ConsoleOptions.ParseAndValidateOptions<ConsoleOptions>(sinkOptions);
+                        return new Sinks.Console(providerName, consoleSinkOptionsDef, telemetryClient, logger, token);                   
                 }
             }
             catch (Exception ex)

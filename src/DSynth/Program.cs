@@ -41,6 +41,7 @@ namespace DSynth
                         {
                             o.UseHttps();
                         });
+                        serverOptions.ListenAnyIP(580);
                     });
 
                     webBuilder.UseStartup<Startup>();

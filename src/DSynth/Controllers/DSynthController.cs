@@ -2,6 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+#nullable enable
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,6 +14,10 @@ using Microsoft.Extensions.Logging;
 using DSynth.Models;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using System.Net;
+using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 
 namespace DSynth.Controllers
 {
@@ -223,10 +228,47 @@ namespace DSynth.Controllers
         /// Retrieves a payload for a given provider
         /// </summary>
         [HttpGet]
+        [HttpPost]
+        [HttpPatch]
         [Route("Providers/{providerName}/GetNextPayload")]
         public IActionResult ProviderGetNextPayload(string providerName)
         {
+            // Remove accept header because the output is determined by the provider
+            if (Request.Headers.TryGetValue(HttpRequestHeader.Accept.ToString(), out _))
+            {
+                Request.Headers.Remove(HttpRequestHeader.Accept.ToString());
+            }
+
+            _logger.LogInformation(new ResponseLog(Request).ToString());
+
             return Ok(_dSynthService.GetNextPayload(providerName).PayloadAsString);
+        }
+    }
+
+    public class ResponseLog
+    {
+        public ResponseLog(HttpRequest request)
+        {
+            using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
+            {
+                this.RequestBody = reader.ReadToEndAsync().Result;
+            }
+
+            this.RequestMethod = request.Method;
+            this.RequestHeaders = request.Headers;
+            this.RequestPath = request.Path;
+            this.RequestQueryString = request.QueryString.ToString();
+        }
+
+        public string RequestPath { get; set; }
+        public string RequestQueryString { get; }
+        public string RequestMethod { get; set; }
+        public IHeaderDictionary RequestHeaders { get; set; }
+        public string? RequestBody { get; set; }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
 }

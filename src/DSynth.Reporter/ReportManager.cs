@@ -51,7 +51,9 @@ namespace DSynth.Reporter
         public void AddMetric(ReportMetric metric)
         {
             long currentMetricSeconds = metric.Timestamp.ToUnixTimeSeconds();
-
+            
+            // TODO: We need to handle when payload intervals are longer than _sampleWindowInSeconds. When
+            // this report timestamps start to drift due to only adding 10 seconds. 
             if (currentMetricSeconds < _currentAggBucketSeconds + _sampleWindowInSeconds)
             {
                 metric.SetId(_currentAggBucketSeconds);
