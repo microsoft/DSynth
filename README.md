@@ -19,12 +19,6 @@ DSynth is a template driven data generator. DSynth accepts templates of various 
 ## Supported Template Formats:
 ```
 - CSV
-- Images
-  - Jpeg
-  - Bmp
-  - Tiff
-  - Gif
-  - Png
 - JSON
 - JSONL
 - RAW
@@ -32,7 +26,7 @@ DSynth is a template driven data generator. DSynth accepts templates of various 
 ```
 
 # To Run
-The project is "mostly" setup to run out of the box and requires prerequisites to support the image generation feature of DSynth (for Mac and Linux). After starting DSynth, you will see payloads in the format of CSV, JSON, XML and RAW written to console. Images are turned off by default, but can easily be enabled by setting `"isPushEnabled": true,` in `sample-providers.json` for the `ImageTemplateSample` provider.
+The project is "mostly" setup to run out of the box. After starting DSynth, you will see payloads in the format of CSV, JSON, XML and RAW written to console.
 
 ### Mac Prerequisites:
 ```
