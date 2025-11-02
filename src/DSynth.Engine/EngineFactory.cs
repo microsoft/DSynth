@@ -29,10 +29,6 @@ namespace DSynth.Engine
                     ret = new CsvEngine(templateName, callingProviderName, token, logger);
                     break;
 
-                case EngineType.Image:
-                    ret = new ImageEngine(templateName, callingProviderName, token, logger);
-                    break;
-
                 case EngineType.Raw:
                     ret = new RawEngine(templateName, callingProviderName, token, logger);
                     break;

@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System;
-using System.Runtime.Serialization;
 
 namespace DSynth.Provider
 {
@@ -20,10 +19,6 @@ namespace DSynth.Provider
         }
 
         public ProviderException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected ProviderException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

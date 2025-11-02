@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System;
-using System.Runtime.Serialization;
 
 namespace DSynth.Services
 {
@@ -20,10 +19,6 @@ namespace DSynth.Services
         }
 
         public ProfileServiceException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected ProfileServiceException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

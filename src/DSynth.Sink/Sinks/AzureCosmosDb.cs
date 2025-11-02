@@ -4,27 +4,23 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using DSynth.Sink.Options;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.CosmosDB.BulkExecutor;
-using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.ApplicationInsights;
 using DSynth.Common.Models;
+using DSynth.Sink.Options;
+using Microsoft.ApplicationInsights;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace DSynth.Sink.Sinks
 {
     public class AzureCosmosDb : SinkBase<AzureCosmosDbOptions>
     {
         private string _metricsName = String.Empty;
-        private DocumentClient _client;
-        private IBulkExecutor _bulkExecutor;
+        private CosmosClient _cosmosClient;
+        private Container _container;
         private List<string> _bulkDocumentsList;
         private AzureCosmosDbOptions _options;
         private TelemetryClient _telemetryClient;
@@ -44,28 +40,25 @@ namespace DSynth.Sink.Sinks
 
         private async Task InitializeClient()
         {
-            ConnectionPolicy connectionPolicy = new ConnectionPolicy
+            CosmosClientOptions cosmosClientOptions = new CosmosClientOptions
             {
-                ConnectionMode = Microsoft.Azure.Documents.Client.ConnectionMode.Direct,
-                ConnectionProtocol = Protocol.Tcp
+                ConnectionMode = ConnectionMode.Direct,
+                AllowBulkExecution = true
             };
 
-            _client = new DocumentClient(new Uri(_options.Endpoint), _options.AuthorizationKey, connectionPolicy);
+            _cosmosClient = new CosmosClient(_options.Endpoint, _options.AuthorizationKey, cosmosClientOptions);
 
-            PartitionKeyDefinition partitionKey = new PartitionKeyDefinition
+            Database database = await _cosmosClient.CreateDatabaseIfNotExistsAsync(_options.Database).ConfigureAwait(false);
+
+            ContainerProperties containerProperties = new ContainerProperties
             {
-                Paths = new Collection<string> { _options.PartitionKey }
+                Id = _options.Collection,
+                PartitionKeyPath = _options.PartitionKey
             };
 
-            DocumentCollection documentCollection = new DocumentCollection { Id = _options.Collection, PartitionKey = partitionKey };
-
-            documentCollection = await _client.CreateDocumentCollectionIfNotExistsAsync(
-                UriFactory.CreateDatabaseUri(_options.Database),
-                documentCollection,
-                new RequestOptions { OfferThroughput = _options.OfferThroughput }).ConfigureAwait(false);
-
-            _bulkExecutor = new BulkExecutor(_client, documentCollection);
-            await _bulkExecutor.InitializeAsync().ConfigureAwait(false);
+            _container = await database.CreateContainerIfNotExistsAsync(
+                containerProperties,
+                throughput: _options.OfferThroughput).ConfigureAwait(false);
 
             _bulkDocumentListFull += HandBulkDocumentListFull;
         }
@@ -88,15 +81,8 @@ namespace DSynth.Sink.Sinks
         {
             try
             {
-                var bulkImportResponse = _bulkExecutor.BulkImportAsync(
-                    _bulkDocumentsList,
-                    _options.EnableUpsert,
-                    _options.DisableAutoIdGeneration,
-                    null,
-                    _options.MaxInMemorySortingBatchSize,
-                    Token).Result;
-
-                SendMetrics(bulkImportResponse);
+                var bulkImportTask = BulkImportAsync(_bulkDocumentsList);
+                bulkImportTask.Wait(Token);
             }
             catch (Exception)
             {
@@ -110,14 +96,47 @@ namespace DSynth.Sink.Sinks
             }
         }
 
-        private void SendMetrics(BulkImportResponse bulkImportResponse)
+        private async Task BulkImportAsync(List<string> documents)
+        {
+            var startTime = DateTime.UtcNow;
+            var tasks = new List<Task<ItemResponse<JObject>>>();
+
+            foreach (var documentJson in documents)
+            {
+                var document = JObject.Parse(documentJson);
+
+                if (_options.EnableUpsert)
+                {
+                    tasks.Add(_container.UpsertItemAsync(document, cancellationToken: Token));
+                }
+                else
+                {
+                    tasks.Add(_container.CreateItemAsync(document, cancellationToken: Token));
+                }
+            }
+
+            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            int successCount = results.Length;
+            int failureCount = 0; // Tasks that fault won't complete, so we track them separately
+            double totalRU = 0;
+
+            foreach (var result in results)
+            {
+                totalRU += result.RequestCharge;
+            }
+
+            var duration = DateTime.UtcNow - startTime;
+            SendMetrics(successCount, failureCount, totalRU, duration);
+        }
+
+        private void SendMetrics(int successCount, int failureCount, double totalRU, TimeSpan duration)
         {
             Metric cosmosMetric = _telemetryClient.GetMetric(_metricsName, $"MetricName");
-            cosmosMetric.TrackValue(bulkImportResponse.BadInputDocuments.Count, "BadInputDocuments");
-            cosmosMetric.TrackValue(bulkImportResponse.FailedImports.Count, "FailedImports");
-            cosmosMetric.TrackValue(bulkImportResponse.NumberOfDocumentsImported, "NumDocumentsImported");
-            cosmosMetric.TrackValue(bulkImportResponse.TotalRequestUnitsConsumed, "TotalRequestUnitsConsumed");
-            cosmosMetric.TrackValue(bulkImportResponse.TotalTimeTaken.TotalMilliseconds, "TotalTimeTaken");
+            cosmosMetric.TrackValue(failureCount, "FailedImports");
+            cosmosMetric.TrackValue(successCount, "NumDocumentsImported");
+            cosmosMetric.TrackValue(totalRU, "TotalRequestUnitsConsumed");
+            cosmosMetric.TrackValue(duration.TotalMilliseconds, "TotalTimeTaken");
         }
     }
 }
