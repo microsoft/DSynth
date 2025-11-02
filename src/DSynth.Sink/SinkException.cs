@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System;
-using System.Runtime.Serialization;
 
 namespace DSynth.Sink
 {
@@ -20,10 +19,6 @@ namespace DSynth.Sink
         }
 
         public SinkException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected SinkException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

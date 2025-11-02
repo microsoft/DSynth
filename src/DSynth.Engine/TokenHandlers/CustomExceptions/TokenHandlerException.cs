@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System;
-using System.Runtime.Serialization;
 
 namespace DSynth.Engine.TokenHandlers
 {
@@ -20,10 +19,6 @@ namespace DSynth.Engine.TokenHandlers
         }
 
         public TokenHandlerException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected TokenHandlerException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

@@ -35,24 +35,6 @@ Output:
 
 ---
 
-## Image
-Images are a unique provider type and we use JSON format to describe what an image will look like. For all available colors, font families and image formats, please see the collections under `src/DSynth/Profiles/Collections/Sample.collections.json`
-```
-{
-  "imageText": "{{JsonCollection:Collection:Sample:availableText}}",
-  "fontSize": {{Number:Range:70..200:0}},
-  "fontFamily": "{{JsonCollection:Collection:Sample:availableFontFamilies}}",
-  "foregroundColor": "{{JsonCollection:Collection:Sample:availableColors}}",
-  "backgroundColor": "{{JsonCollection:Collection:Sample:availableColors}}",
-  "imageFormat": "{{JsonCollection:Collection:Sample:availableFormats}}"
-}
-```
-
-Output:<br />
-![sample-image-output.png](./images/sample-image-output.png)
-
----
-
 ## JSON
 Sample Template:
 ```json

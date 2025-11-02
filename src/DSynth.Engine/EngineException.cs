@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System;
-using System.Runtime.Serialization;
 
 namespace DSynth.Engine
 {
@@ -20,10 +19,6 @@ namespace DSynth.Engine
         }
 
         public EngineException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected EngineException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

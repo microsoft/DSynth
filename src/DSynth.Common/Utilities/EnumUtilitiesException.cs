@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System;
-using System.Runtime.Serialization;
 
 namespace DSynth.Common.Utilities
 {
@@ -20,10 +19,6 @@ namespace DSynth.Common.Utilities
         }
 
         public EnumUtilitiesException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected EnumUtilitiesException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

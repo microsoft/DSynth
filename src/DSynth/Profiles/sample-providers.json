@@ -75,25 +75,6 @@
       "advancedOptions": {
         "targetQueueSize": 10
       }
-    },
-    {
-      "isPushEnabled": false,
-      "type": "Image",
-      "providerName": "ImageTemplateSample",
-      "sinks": [
-        {
-          "type": "File",
-          "baseFolderPath": "./file-sink-output",
-          "subfolderPattern": "{year}_{month}_{day}",
-          "filenamePattern": "image-{year}_{month}_{day}_{hour}_{minute}_{second}_{millisecond}",
-          "filenameSuffix": "Value will get overridden for images"
-        }
-      ],
-      "intervalInMs": 10000,
-      "templateName": "ImageSample.template.image",
-      "advancedOptions": {
-        "targetQueueSize": 10
-      }
     }
   ]
 }

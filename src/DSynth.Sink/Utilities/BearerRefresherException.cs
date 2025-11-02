@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 using System;
-using System.Runtime.Serialization;
 
 namespace DSynth.Sink.Utilities
 {
@@ -20,10 +19,6 @@ namespace DSynth.Sink.Utilities
         }
 
         public BearerRefresherException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected BearerRefresherException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

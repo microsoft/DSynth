@@ -55,7 +55,7 @@ The following parameters are available for each Provider. You can have multiple 
 |Parameter Name|Available Values|Description|
 |--|--|--|
 |isPushEnabled|true \| false|Enables or disables pushing to the configured sink. Regardless if push is enabled or disabled, you can still pull from the endpoint|
-|type|JSON \| XML \| CSV \| RAW \| Image \| JSONL|The payload type that will be generated|
+|type|JSON \| XML \| CSV \| RAW \| JSONL|The payload type that will be generated|
 |providerName|Non-Spaced string value|Will be used to map to the sink configuration, as well as the endpoint name to perform pull operations. **This needs to be unique**|
 |sinks|A collection of sink configurations|Sink configuration parameters (See [Sinks](./docs/Sinks.md) for details)|
 |intervalInMs|Integer value|How often to ship payloads to the configured sink|
@@ -79,29 +79,7 @@ These should not need to be touched in most regular use cases. They have default
 |Provider|Azure Blob|Azure Cosmos DB|Azure Event Hubs|Azure IoT Hub|Azure Service Bus|File|Console|Http|Socket Server|
 |--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 |CSV|✅|🚫|🚫|✅||🚫|✅|✅|✅|✅|
-|Image|✅|🚫|🚫|🚫|🚫|✅|🚫|🚫|🚫|
 |JSON|✅|✅|✅|✅|✅|✅|✅|✅|✅|
 |JSONL (Json Lines)|✅|🚫|✅|✅|✅|✅|✅|✅|✅|
 |RAW|✅|🚫|✅|✅|✅|✅|✅|✅|✅|
 |XML|✅|🚫|✅|✅|🚫|✅|✅|✅|✅|
-
-## Special Provider Considerations
-### Image
-The image provider type does not support batching.
-
-|Parameter Name|Available Values|Description|
-|--|--|--|
-|payloadMinBatchSize|1|Required to be set to 1|
-|payloadMaxBatchSize|0|Required to be set to 0|
-
-```
-Note:
-When using either AzureBlob or File sink, the "fileNameSuffix" will be overridden by "imageFormat" from the image template.
-```
-
-
-
-
-
-
-
