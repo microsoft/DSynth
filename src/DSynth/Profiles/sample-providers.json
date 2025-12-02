@@ -16,7 +16,8 @@
       "minBatchSize": 1,
       "maxBatchSize": 0,
       "advancedOptions": {
-        "targetQueueSize": 10
+        "targetQueueSize": 1,
+        "parallelSinkOperations": 1
       }
     },
     {
@@ -35,7 +36,8 @@
       "minBatchSize": 1,
       "maxBatchSize": 0,
       "advancedOptions": {
-        "targetQueueSize": 10
+        "targetQueueSize": 1,
+        "parallelSinkOperations": 1
       }
     },
     {
@@ -54,7 +56,8 @@
       "minBatchSize": 1,
       "maxBatchSize": 0,
       "advancedOptions": {
-        "targetQueueSize": 10
+        "targetQueueSize": 1,
+        "parallelSinkOperations": 1
       }
     },
     {
@@ -73,7 +76,8 @@
       "minBatchSize": 1,
       "maxBatchSize": 0,
       "advancedOptions": {
-        "targetQueueSize": 10
+        "targetQueueSize": 1,
+        "parallelSinkOperations": 1
       }
     }
   ]

@@ -24,6 +24,8 @@ namespace DSynth.Provider
         private readonly Random _random;
         private BlockingCollection<object> _blockingCollection;
         private IDSynthEngine _dsynthEngine;
+        private readonly SemaphoreSlim _productionSemaphore;
+        private long _totalConsumed = 0;
 
         public ProviderQueue(IDSynthEngine dSynthEngine, DSynthProviderOptions options, ILogger logger, CancellationToken token)
         {
@@ -35,10 +37,14 @@ namespace DSynth.Provider
             _blockingCollection = new BlockingCollection<object>(_options.AdvancedOptions.TargetQueueSize);
             _dsynthEngine = dSynthEngine;
 
-            Parallel.For(0, _options.AdvancedOptions.QueueWorkers, index =>
+            // Semaphore initialized with target queue size - signals available production slots
+            _productionSemaphore = new SemaphoreSlim(_options.AdvancedOptions.TargetQueueSize, _options.AdvancedOptions.TargetQueueSize);
+
+            // Start queue worker tasks - they wait on semaphore signals
+            for (int i = 0; i < _options.AdvancedOptions.QueueWorkers; i++)
             {
-                Task.Run(() => PopulateCollectionAsync(_dsynthEngine));
-            });
+                Task.Run(() => PopulateCollectionAsync(_dsynthEngine), token);
+            }
         }
 
         public static ProviderQueue CreateNew(IDSynthEngine dSynthEngine, DSynthProviderOptions options, ILogger logger, CancellationToken token)
@@ -46,17 +52,37 @@ namespace DSynth.Provider
             return new ProviderQueue(dSynthEngine, options, logger, token);
         }
 
-        private Task PopulateCollectionAsync(IDSynthEngine dSynthEngine)
+        private async Task PopulateCollectionAsync(IDSynthEngine dSynthEngine)
         {
             while (!_token.IsCancellationRequested)
             {
                 try
                 {
-                    _blockingCollection.Add(dSynthEngine.BuildPayload());
+                    // Wait for a signal that space is available (blocks until item consumed)
+                    await _productionSemaphore.WaitAsync(_token);
+
+                    // Build payload - this happens ONLY when there's space/demand
+                    var payload = dSynthEngine.BuildPayload();
+
+                    // Add to queue (should never block since semaphore guarantees space)
+                    if (!_blockingCollection.TryAdd(payload, 0, _token))
+                    {
+                        // Shouldn't happen, but release semaphore if add fails
+                        _productionSemaphore.Release();
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Normal cancellation, exit gracefully
+                    break;
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Collection disposed, exit gracefully
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    _blockingCollection.Dispose();
                     var formattedExMessage = ExceptionUtilities.GetFormattedMessage(
                         Resources.ProviderQueue.ExUnableToPopulateCollection,
                         _options.Type,
@@ -64,11 +90,13 @@ namespace DSynth.Provider
 
                     var providerException = new ProviderException(formattedExMessage, ex);
                     _logger.LogError(providerException, providerException.Message);
+
+                    // Release semaphore so production can continue
+                    _productionSemaphore.Release();
+
                     throw providerException;
                 }
             }
-
-            return Task.CompletedTask;
         }
 
         private object TryDequeue()
@@ -77,18 +105,25 @@ namespace DSynth.Provider
 
             try
             {
+                // Bypass queue for queue size of 1 (direct generation mode)
                 if (_options.AdvancedOptions.TargetQueueSize == 1)
                 {
                     return _dsynthEngine.BuildPayload();
                 }
-                
-                while (!_blockingCollection.TryTake(out ret) && !_token.IsCancellationRequested)
+
+                // Block until item is available
+                if (_blockingCollection.TryTake(out ret, Timeout.Infinite, _token))
                 {
-                    // Slight delay when the blocking collection is empty. We will
-                    // backoff slightly to allow the collection to get items, so we
-                    // are not constantly spinning on an empty collection.
-                    Task.Delay(5).GetAwaiter().GetResult();
+                    // Item consumed - signal producers that space is available
+                    _productionSemaphore.Release();
+
+                    Interlocked.Increment(ref _totalConsumed);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // Normal cancellation
+                return ret;
             }
             catch (ObjectDisposedException ex)
             {
@@ -116,6 +151,12 @@ namespace DSynth.Provider
                         _options.MinBatchSize : _random.Next(_options.MinBatchSize, _options.MaxBatchSize);
 
                     _payloadCollection.Clear();
+
+                    // Pre-allocate capacity if known
+                    if (_payloadCollection is List<object> list)
+                    {
+                        list.Capacity = (int)payloadCount;
+                    }
 
                     while (_payloadCollection.Count < payloadCount && !_token.IsCancellationRequested)
                     {

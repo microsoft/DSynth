@@ -6,6 +6,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using DSynth.Extensions;
+using System.Net;
 
 namespace DSynth
 {
@@ -13,6 +14,10 @@ namespace DSynth
     {
         public static void Main(string[] args)
         {
+            // Configure outbound HTTP connection limits for high concurrency
+            ServicePointManager.DefaultConnectionLimit = 5000;
+            ServicePointManager.Expect100Continue = false;
+
             string mode = string.Empty;
             if (args.Length > 0)
             {

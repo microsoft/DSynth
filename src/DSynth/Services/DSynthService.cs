@@ -110,10 +110,15 @@ namespace DSynth.Services
 
                     if (providerPackage.Options.IsPushEnabled)
                     {
-                        _providerTasks.Add(Task.Run(() =>
+                        // Spawn N concurrent tasks for this provider based on ParallelSinkOperations property
+                        int parallelSinkOperations = providerOptions.AdvancedOptions.ParallelSinkOperations > 0 ? providerOptions.AdvancedOptions.ParallelSinkOperations : 1;
+                        for (int i = 0; i < parallelSinkOperations; i++)
                         {
-                            ProviderSinkTask(providerPackage, providerOptions.MaxIterations, _token);
-                        }));
+                            _providerTasks.Add(Task.Run(async () =>
+                            {
+                                await ProviderSinkTaskAsync(providerPackage, providerOptions.MaxIterations, _token);
+                            }));
+                        }
                     }
                 }
                 catch (DSynth.Provider.ProviderException ex)
@@ -131,7 +136,7 @@ namespace DSynth.Services
             });
         }
 
-        private Task ProviderSinkTask(ProviderPackage package, int maxIterations, CancellationToken token)
+        private async Task ProviderSinkTaskAsync(ProviderPackage package, int maxIterations, CancellationToken token)
         {
             // Check to see if maxIterations > 0 and if so, set it to 0 to start tracking iterations.
             // Else we set it to -1 to keep sending infinitely, until DSynth is stopped.
@@ -146,7 +151,8 @@ namespace DSynth.Services
 
                     if (PayloadPackage.PayloadAsBytes.Length > 4)
                     {
-                        Task.WhenAll(package.Sinks.Select(i => i.SendPayloadAsync(PayloadPackage))).GetAwaiter().GetResult();
+                        // Use await instead of GetAwaiter().GetResult()
+                        await Task.WhenAll(package.Sinks.Select(i => i.SendPayloadAsync(PayloadPackage)));
                         iterationCount = maxIterations > 0 ? ++iterationCount : -1;
                     }
                 }
@@ -160,7 +166,8 @@ namespace DSynth.Services
                     throw;
                 }
 
-                Task.Delay(package.Options.IntervalInMs).Wait();
+                // Use await instead of Wait()
+                await Task.Delay(package.Options.IntervalInMs, token);
             }
 
             // Log event when we complete sending payloads to the provider's sink
@@ -178,8 +185,6 @@ namespace DSynth.Services
             // the while loop and set a default longer check duration. The next config
             // update will reset this value back to the desired interval.
             package.Options.IntervalInMs = package.Options.AdvancedOptions.PushDisabledIntervalInMs;
-
-            return Task.CompletedTask;
         }
 
         public Task StopAsync()
