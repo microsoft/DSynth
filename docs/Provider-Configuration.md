@@ -44,8 +44,9 @@ The following parameters are available for each Provider. You can have multiple 
     "terminateWhenComplete": false,
     "advancedOptions": {
       "pushDisabledIntervalInMs": 10000,
-      "targetQueueSize": 50000,
-      "queueWorkers": 1
+      "targetQueueSize": 1,
+      "queueWorkers": 1,
+      "parallelSinkOperations": 1
     }
   ]
 }
@@ -70,15 +71,38 @@ These should not need to be touched in most regular use cases. They have default
 |Parameter Name|Available Values|Description|
 |--|--|--|
 |pushDisabledIntervalInMs|Integer value|When a provider goes from isPushEnabled = true to false, we reduce the frequency that we check for it to be enabled to reduce additional overhead. When isPushEnabled gets reenabled, there will be a maximum of a 10 second delay before the payload provider starts sending requests again. **Default 10000**|
-|targetQueueSize|Integer value|The number of items to keep in the payload queue. It is recommended to set this to the number minBatchSize or maxBatchSize, whichever is greater. **Default 50000**|
+|targetQueueSize|Integer value|The number of items to keep in the payload queue. In most scenarios, setting this to **1** (default) is optimal as it generates payloads in real-time with minimal memory overhead. For larger payloads or when payload generation is expensive, increasing this value pre-generates and caches payloads to improve throughput. Adjust based on payload size and generation cost. **Default 1**|
 |queueWorkers|Integer value|The number of queue workers populating the payload queue. As throughput increases, 1 worker may have troubles re populating the queue and this number may need to be adjusted. **Default 1**|
+|parallelSinkOperations|Integer value|The number of concurrent tasks spawned per provider for sending payloads to sinks. Enables high-throughput scenarios by allowing N parallel sink operations from a single provider definition. **Default 1**|
+
+### Parallel Sink Operations Configuration
+The `parallelSinkOperations` setting controls how many parallel tasks execute for each provider. This enables scenarios requiring thousands of simultaneous connections.
+
+**Use Cases:**
+- High-volume HTTP load testing (e.g., 3,000+ concurrent requests)
+- Saturating event streaming sinks and helps simulate concurrent calls
+
+**Limitations:**
+- **Resource Consumption**: Each concurrent call consumes memory and CPU; monitor system resources when setting high values
+- **Network Bandwidth**: Local network adapters may become the bottleneck at very high concurrency levels (>5,000)
+
+**Example Configuration for 20 Parallel Sink Operations:**
+```json
+{
+  "advancedOptions": {
+    "targetQueueSize": 1,
+    "queueWorkers": 1,
+    "parallelSinkOperations": 20
+  }
+}
+```
 
 
 ## Supported Sink Configurations by Provider Type
 
 |Provider|Azure Blob|Azure Cosmos DB|Azure Event Hubs|Azure IoT Hub|Azure Service Bus|File|Console|Http|Socket Server|
 |--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|CSV|✅|🚫|🚫|✅||🚫|✅|✅|✅|✅|
+|CSV|✅|🚫|🚫|✅|🚫|🚫|✅|✅|✅|✅|
 |JSON|✅|✅|✅|✅|✅|✅|✅|✅|✅|
 |JSONL (Json Lines)|✅|🚫|✅|✅|✅|✅|✅|✅|✅|
 |RAW|✅|🚫|✅|✅|✅|✅|✅|✅|✅|

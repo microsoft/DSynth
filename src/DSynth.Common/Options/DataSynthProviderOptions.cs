@@ -70,6 +70,7 @@ namespace DSynth.Common.Options
                 this.AdvancedOptions.PushDisabledIntervalInMs = options.AdvancedOptions.PushDisabledIntervalInMs;
                 this.AdvancedOptions.QueueWorkers = options.AdvancedOptions.QueueWorkers;
                 this.AdvancedOptions.TargetQueueSize = options.AdvancedOptions.TargetQueueSize;
+                this.AdvancedOptions.ParallelSinkOperations = options.AdvancedOptions.ParallelSinkOperations;
             }
         }
 
@@ -218,9 +219,12 @@ namespace DSynth.Common.Options
         public int PushDisabledIntervalInMs { get; set; } = 10000;
 
         [JsonProperty("targetQueueSize")]
-        public int TargetQueueSize { get; set; } = 50000;
+        public int TargetQueueSize { get; set; } = 1;
 
         [JsonProperty("queueWorkers")]
         public int QueueWorkers { get; set; } = 1;
+
+        [JsonProperty("parallelSinkOperations")]
+        public int ParallelSinkOperations { get; set; } = 1;
     }
 }
