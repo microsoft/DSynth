@@ -112,11 +112,29 @@ namespace DSynth.Services
                     {
                         // Spawn N concurrent tasks for this provider based on ParallelSinkOperations property
                         int parallelSinkOperations = providerOptions.AdvancedOptions.ParallelSinkOperations > 0 ? providerOptions.AdvancedOptions.ParallelSinkOperations : 1;
+
+                        int startIndex = _providerTasks.Count;
                         for (int i = 0; i < parallelSinkOperations; i++)
                         {
                             _providerTasks.Add(Task.Run(async () =>
                             {
                                 await ProviderSinkTaskAsync(providerPackage, providerOptions.MaxIterations, _token);
+                            }));
+                        }
+
+                        // Add a completion task that waits for all parallel operations to finish
+                        if (providerPackage.Options.TerminateWhenComplete)
+                        {
+                            int endIndex = _providerTasks.Count;
+                            _providerTasks.Add(Task.Run(async () =>
+                            {
+                                await Task.WhenAll(_providerTasks.GetRange(startIndex, endIndex - startIndex));
+
+                                // Only terminate when ALL parallel tasks complete
+                                if (_isHeadless)
+                                {
+                                    _applicationLifetime.StopApplication();
+                                }
                             }));
                         }
                     }
@@ -166,8 +184,11 @@ namespace DSynth.Services
                     throw;
                 }
 
-                // Use await instead of Wait()
-                await Task.Delay(package.Options.IntervalInMs, token);
+                // Only delay if we haven't reached max iterations
+                if (iterationCount < maxIterations || maxIterations == 0)
+                {
+                    await Task.Delay(package.Options.IntervalInMs, token);
+                }
             }
 
             // Log event when we complete sending payloads to the provider's sink
@@ -178,8 +199,6 @@ namespace DSynth.Services
                 {"MaxIterations", maxIterations.ToString()},
                 {"IterationCount", iterationCount.ToString()},
                 {"DSynthStatus", JsonConvert.SerializeObject(_dSynthStatus)}});
-
-            if (_isHeadless && package.Options.TerminateWhenComplete) { _applicationLifetime.StopApplication(); }
 
             // If the provider gets disabled, we want to make sure we are not spamming
             // the while loop and set a default longer check duration. The next config
